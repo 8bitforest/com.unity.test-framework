@@ -52,9 +52,9 @@ namespace UnityEngine.TestTools
         /// Returns true if the instruction expects a domain reload to occur.
         /// </summary>
         public bool ExpectDomainReload { get; private set; }
-        /// <returns>
+        /// <summary>
         /// Returns true if the instruction expects the Unity Editor to be in **Play Mode**.
-        /// </returns>
+        /// </summary>
         public bool ExpectedPlaymodeState { get; }
         /// <summary>
         /// Indicates whether a script compilation is expected.

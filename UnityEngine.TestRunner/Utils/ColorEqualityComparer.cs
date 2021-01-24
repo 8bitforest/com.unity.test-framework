@@ -12,9 +12,9 @@ namespace UnityEngine.TestTools.Utils
 
 
         private static readonly ColorEqualityComparer m_Instance = new ColorEqualityComparer();
-        /// <returns>
+        /// <summary>
         ///A singleton instance of the comparer with a default error value set to 0.01f.
-        /// </returns>>
+        /// </summary>
         public static ColorEqualityComparer Instance { get { return m_Instance; } }
 
         private ColorEqualityComparer() : this(k_DefaultError)

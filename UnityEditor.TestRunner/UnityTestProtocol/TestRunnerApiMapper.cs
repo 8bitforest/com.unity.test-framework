@@ -55,12 +55,6 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
             if (result.TestStatus == TestStatus.Passed)
             {
                 state = TestState.Success;
-
-                var runstate = GetRunStateFromResultNunitXml(result);
-                runstate = runstate ?? String.Empty;
-
-                if (runstate.ToLowerInvariant().Equals("explicit"))
-                    state = TestState.Skipped;
             }
             else if (result.TestStatus == TestStatus.Skipped)
             {

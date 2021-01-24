@@ -42,7 +42,7 @@ public class SetUpTearDownExample
         Debug.Log("This runs inside playmode");
     }
 
-    [UnitySetUp]
+    [UnityTearDown]
     public IEnumerator TearDown()
     {
 

@@ -19,13 +19,13 @@ namespace UnityEngine.TestTools
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
     public class UnityPlatformAttribute : NUnitAttribute, IApplyToTest
     {
-        /// <returns>
+        /// <summary>
         /// A subset of platforms you need to have your tests run on.
-        /// </returns>
+        /// </summary>
         public RuntimePlatform[] include { get; set; }
-        /// <returns>
+        /// <summary>
         /// List the platforms you do not want to have your tests run on.
-        /// </returns>
+        /// </summary>
         public RuntimePlatform[] exclude { get; set; }
 
         private string m_skippedReason;

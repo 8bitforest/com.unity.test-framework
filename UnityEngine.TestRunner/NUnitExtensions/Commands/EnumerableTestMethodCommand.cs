@@ -78,7 +78,7 @@ namespace UnityEngine.TestTools
 
                 if (enumerator.Current is IEnumerator)
                 {
-                    var current = (IEnumerator)enumerator.Current;
+                    var current = (IEnumerator)enumerator.Current; 
                     yield return ExecuteEnumerableAndRecordExceptions(current, context);
                 }
                 else

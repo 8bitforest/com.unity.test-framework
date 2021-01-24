@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEditor.Scripting.ScriptCompilation;
 using UnityEngine.TestTools;
 using UnityEngine.TestTools.Utils;
@@ -43,27 +44,77 @@ namespace UnityEditor.TestTools.TestRunner
                 {TestPlatform.EditMode, new List<IAssemblyWrapper>() },
                 {TestPlatform.PlayMode, new List<IAssemblyWrapper>() }
             };
+            var filteredAssemblies = FilterAssembliesWithTestReference(loadedAssemblies);
 
-            foreach (var loadedAssembly in loadedAssemblies)
+            foreach (var loadedAssembly in filteredAssemblies)
             {
-                if (loadedAssembly.GetReferencedAssemblies().Any(x => x.Name == k_NunitAssemblyName || x.Name == k_TestRunnerAssemblyName || x.Name == k_PerformanceTestingAssemblyName))
+                var assemblyName = new FileInfo(loadedAssembly.Location).Name;
+                var scriptAssemblies = m_AllEditorScriptAssemblies.Where(x => x.Filename == assemblyName).ToList();
+                var precompiledAssemblies = m_AllPrecompiledAssemblies.Where(x => new FileInfo(x.Path).Name == assemblyName).ToList();
+                if (scriptAssemblies.Count < 1 && precompiledAssemblies.Count < 1)
                 {
-                    var assemblyName = new FileInfo(loadedAssembly.Location).Name;
-                    var scriptAssemblies = m_AllEditorScriptAssemblies.Where(x => x.Filename == assemblyName).ToList();
-                    var precompiledAssemblies = m_AllPrecompiledAssemblies.Where(x => new FileInfo(x.Path).Name == assemblyName).ToList();
-                    if (scriptAssemblies.Count < 1 && precompiledAssemblies.Count < 1)
-                    {
-                        continue;
-                    }
-
-                    var assemblyFlags = scriptAssemblies.Any() ? scriptAssemblies.Single().Flags : precompiledAssemblies.Single().Flags;
-                    var assemblyType = (assemblyFlags & AssemblyFlags.EditorOnly) == AssemblyFlags.EditorOnly ? TestPlatform.EditMode : TestPlatform.PlayMode;
-                    result[assemblyType].Add(loadedAssembly);
-                    yield return null;
+                    continue;
                 }
+
+                var assemblyFlags = scriptAssemblies.Any() ? scriptAssemblies.Single().Flags : precompiledAssemblies.Single().Flags;
+                var assemblyType = (assemblyFlags & AssemblyFlags.EditorOnly) == AssemblyFlags.EditorOnly ? TestPlatform.EditMode : TestPlatform.PlayMode;
+                result[assemblyType].Add(loadedAssembly);
+                yield return null;
             }
 
             yield return result;
+        }
+        
+        private IAssemblyWrapper[] FilterAssembliesWithTestReference(IAssemblyWrapper[] loadedAssemblies)
+        {
+            var filteredResults = new Dictionary<IAssemblyWrapper, bool>();
+            foreach (var assembly in loadedAssemblies)
+            {
+                FilterAssemblyForTestReference(assembly, loadedAssemblies, filteredResults);
+            }
+
+            return filteredResults.Where(pair => pair.Value).Select(pair => pair.Key).ToArray();
+        }
+        
+        private void FilterAssemblyForTestReference(IAssemblyWrapper assemblyToFilter, IAssemblyWrapper[] loadedAssemblies, IDictionary<IAssemblyWrapper, bool> filterResults)
+        {
+            if (filterResults.ContainsKey(assemblyToFilter))
+            {
+                return;
+            }
+
+            var references = assemblyToFilter.GetReferencedAssemblies();
+            if (references.Any(IsTestReference))
+            {
+                filterResults[assemblyToFilter] = true;
+                return;
+            }
+
+            foreach (var reference in references)
+            {
+                var referencedAssembly = loadedAssemblies.FirstOrDefault(a => a.Name.Name == reference.Name);
+                if (referencedAssembly == null)
+                {
+                    continue;
+                }
+
+                FilterAssemblyForTestReference(referencedAssembly, loadedAssemblies, filterResults);
+
+                if (filterResults[referencedAssembly])
+                {
+                    filterResults[assemblyToFilter] = true;
+                    return;
+                }
+            }
+            
+            filterResults[assemblyToFilter] = false;
+        }
+
+        private static bool IsTestReference(AssemblyName assemblyName)
+        {
+            return assemblyName.Name == k_NunitAssemblyName || 
+                   assemblyName.Name == k_TestRunnerAssemblyName ||
+                   assemblyName.Name == k_PerformanceTestingAssemblyName;
         }
     }
 }

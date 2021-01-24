@@ -17,20 +17,18 @@ namespace UnityEngine.TestTools.Utils
 
         private static readonly Vector2EqualityComparer m_Instance = new Vector2EqualityComparer();
 
-        /// <returns>
+        /// <summary>
         /// A comparer instance with the default error value set to 0.0001f.
-        ///</returns>>
+        ///</summary>
         public static Vector2EqualityComparer Instance { get { return m_Instance; } }
 
         private Vector2EqualityComparer() : this(k_DefaultError)
         {
         }
         /// <summary>
-        /// Creates an instance with a custom error value.
+        /// Initializes an instance of Vector2Equality comparer with custom allowed calculation error.
         /// </summary>
         /// <param name="error">This value identifies the calculation error allowed.</param>
-        /// <typeparam name="float">A float number.</typeparam>
-        /// <returns>A comparer with custom allowed calculation error</returns>
         public Vector2EqualityComparer(float error)
         {
             this.AllowedError = error;
@@ -39,9 +37,7 @@ namespace UnityEngine.TestTools.Utils
         /// Compares the actual and expected Vector2 objects for equality using the <see cref="Utils.AreFloatsEqual"/> method.
         /// </summary>
         /// <param name="expected">The expected Vector2 used for comparison</param>
-        ///<typeparam name="Vector2"></typeparam>
         /// <param name="actual">The actual Vector2 to test</param>
-        /// <typeparam name="Vector2"></typeparam>
         /// <returns>True if the vectors are equals, false otherwise.</returns>
         /// <example>
         /// The following example shows how to verify if two Vector2 are equals

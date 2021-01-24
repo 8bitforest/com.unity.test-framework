@@ -24,15 +24,17 @@ namespace UnityEditor.TestTools.TestRunner.Api
         [SerializeField]
         internal BuildTarget? targetPlatform;
 
-        /// <returns>
+        /// <summary>
         /// An instance of <see cref="ITestRunSettings"/> to set up before running tests on a Player.
-        /// </returns>
+        /// </summary>
         // Note: Is not available after serialization
         public ITestRunSettings overloadTestRunSettings;
         
         [SerializeField]
         internal Filter filter;
-        ///<returns>A collection of <see cref="Filter"/> to execute tests on.</returns>
+        ///<summary>
+        ///A collection of <see cref="Filter"/> to execute tests on.
+        ///</summary>
         [SerializeField]
         public Filter[] filters;
         /// <summary>
@@ -41,9 +43,9 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <returns>If true, the call to Execute() will run tests synchronously, guaranteeing that all tests have finished running by the time the call returns.</returns>
         [SerializeField]
         public bool runSynchronously;
-        /// <returns>
+        /// <summary>
         /// The time, in seconds, the editor should wait for heartbeats after starting a test run on a player. This defaults to 10 minutes.
-        /// </returns>
+        /// </summary>
         [SerializeField]
         public int playerHeartbeatTimeout = 60*10;
 

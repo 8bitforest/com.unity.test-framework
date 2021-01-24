@@ -81,6 +81,7 @@ namespace UnityEngine.TestTools.Utils
         /// Optimized for testing performance.
         /// </summary>
         /// <returns>A GameObject with primitive mesh renderer and collider.</returns>
+        /// <param name="type">The type of primitive object to create.</param>
         public static GameObject CreatePrimitive(PrimitiveType type)
         {
             var prim = GameObject.CreatePrimitive(type);

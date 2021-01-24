@@ -24,11 +24,11 @@ Runs tests in the Project.
 
 ### testCategory
 
-A semicolon-separated list of test categories to include in the run. If using both `testFilter` and `testCategory`, then tests only run that matches both. This argument supports negation using '!'. If using '!MyCategory' then no tests with the 'MyCategory' category will be included in the run.
+A semicolon-separated list of test categories to include in the run. A semi-colon separated list should be formatted as a string enclosed in quotation marks, e.g. `testCategory="firstCategory;secondCategory"`. If using both `testFilter` and `testCategory`, then only tests that match both are run. This argument supports negation using '!'. If using '!MyCategory' then no tests with the 'MyCategory' category will be included in the run.
 
 ### testFilter
 
-A semicolon-separated list of test names to run, or a regular expression pattern to match tests by their full name. This argument supports negation using '!'. If using the test filter '!MyNamespace.Something.MyTest', then all tests except that test will be run.
+A semicolon-separated list of test names to run, or a regular expression pattern to match tests by their full name. A semi-colon separated list should be formatted as a string enclosed in quotation marks, e.g. `testFilter="Low;Medium"`. This argument supports negation using '!'. If using the test filter '!MyNamespace.Something.MyTest', then all tests except that test will be run.
 
 ### testPlatform
 
@@ -49,7 +49,7 @@ Platform/Type convention is from the [BuildTarget](https://docs.unity3d.com/Scri
 
 ### assemblyNames
 
-A semicolon-separated list of test assemblies to include in the run.
+A semicolon-separated list of test assemblies to include in the run. A semi-colon separated list should be formatted as a string enclosed in quotation marks, e.g. `assemblyNames="firstAssembly;secondAssembly"`.
 
 ### testResults
 

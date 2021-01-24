@@ -14,7 +14,7 @@ The most simple example of an Edit Mode test could be the one that yields `null`
 [UnityTest]
 public IEnumerator EditorUtility_WhenExecuted_ReturnsSuccess()
 {
-    var utility = RunEditorUtilityInTheBackgroud();
+    var utility = RunEditorUtilityInTheBackground();
 
     while (utility.isRunning)
     {

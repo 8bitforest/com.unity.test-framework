@@ -15,9 +15,9 @@ namespace UnityEngine.TestTools.Utils
         private readonly float AllowedError;
 
         private static readonly QuaternionEqualityComparer m_Instance = new QuaternionEqualityComparer();
-        /// <returns>
+        /// <summary>
         ///A comparer instance with the default error value 0.00001f.
-        /// </returns>>
+        /// </summary>
         public static QuaternionEqualityComparer Instance { get { return m_Instance; } }
 
 

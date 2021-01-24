@@ -11,15 +11,15 @@ namespace UnityEngine.TestTools.Utils
         private readonly float AllowedError;
 
         private static readonly Vector4EqualityComparer m_Instance = new Vector4EqualityComparer();
-        /// <returns>
+        /// <summary>
         /// A comparer instance with the default calculation error value set to 0.0001f.
-        /// </returns>
+        /// </summary>
         public static Vector4EqualityComparer Instance { get { return m_Instance; } }
 
         private Vector4EqualityComparer() : this(k_DefaultError) {}
-        /// <returns>
-        /// Creates an instance with a custom error value.
-        /// </returns>
+        /// <summary>
+        /// Initializes an instance of Vector4Equality comparer with custom allowed calculation error.
+        /// </summary>
         /// <param name="allowedError">This value identifies the calculation error allowed.</param>
         public Vector4EqualityComparer(float allowedError)
         {

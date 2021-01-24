@@ -16,17 +16,6 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
             Logger = utpLogger;
         }
 
-        public void ReportAssemblyCompilationErrors(string assembly, IEnumerable<CompilerMessage> errorCompilerMessages)
-        {
-            var compilationErrorMessage = new AssemblyCompilationErrorsMessage
-            {
-                assembly = assembly,
-                errors = errorCompilerMessages.Select(x => x.message).ToArray()
-            };
-
-            Logger.Log(compilationErrorMessage);
-        }
-
         public void ReportTestRunStarted(ITestAdaptor testsToRun)
         {
             var msg = TestRunnerApiMapper.MapTestToTestPlanMessage(testsToRun);

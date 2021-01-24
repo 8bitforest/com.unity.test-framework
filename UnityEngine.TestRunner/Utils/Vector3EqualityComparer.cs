@@ -13,15 +13,17 @@ namespace UnityEngine.TestTools.Utils
 
         private static readonly Vector3EqualityComparer m_Instance = new Vector3EqualityComparer();
 
-        /// <returns>A comparer instance with the default calculation error value equal to 0.0001f.
-        ///</returns>
+        /// <summary>
+        /// A comparer instance with the default calculation error value equal to 0.0001f.
+        ///</summary>
         public static Vector3EqualityComparer Instance { get { return m_Instance; } }
 
         private Vector3EqualityComparer() : this(k_DefaultError) {}
 
+        /// <summary>
+        /// Initializes an instance of Vector3Equality comparer with custom allowed calculation error.
+        /// </summary>
         /// <param name="allowedError">This value identifies the calculation error allowed.</param>
-        /// <typeparam name="float">A float number.</typeparam>
-        /// <returns>A comparer with custom allowed calculation error </returns>
         public Vector3EqualityComparer(float allowedError)
         {
             this.AllowedError = allowedError;
@@ -31,9 +33,7 @@ namespace UnityEngine.TestTools.Utils
         /// for equality using <see cref="Utils.AreFloatsEqual"/> to compare the x, y, and z attributes of Vector3.
         /// </summary>
         /// <param name="expected">The expected Vector3 used for comparison</param>
-        /// <typeparam name="Vector3"></typeparam>
         /// <param name="actual">The actual Vector3 to test</param>
-        /// <typeparam name="Vector3"></typeparam>
         /// <returns>True if the vectors are equals, false otherwise.</returns>
         /// <example>
         /// The following example shows how to verify if two Vector3 are equals

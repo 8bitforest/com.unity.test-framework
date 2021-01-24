@@ -74,7 +74,15 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <summary>
         /// Sets up a given instance of <see cref="ICallbacks"/> to be invoked on test runs.
         /// </summary>
-        /// <param name="testCallbacks">The test callbacks to be invoked</param>
+        /// <typeparam name="T">
+        /// Generic representing a type of callback.
+        /// </typeparam>
+        /// <param name="testCallbacks">
+        /// The test callbacks to be invoked.
+        /// </param>
+        /// <param name="priority">
+        /// Sets the order in which the callbacks are invoked, starting with the highest value first.
+        /// </param>
         public void RegisterCallbacks<T>(T testCallbacks, int priority = 0) where T : ICallbacks
         {
             if (testCallbacks == null)
@@ -87,6 +95,9 @@ namespace UnityEditor.TestTools.TestRunner.Api
         /// <summary>
         /// Unregister an instance of <see cref="ICallbacks"/> to no longer receive callbacks from test runs.
         /// </summary>
+        /// <typeparam name="T">
+        /// Generic representing a type of callback.
+        /// </typeparam>
         /// <param name="testCallbacks">The test callbacks to unregister.</param>
         public void UnregisterCallbacks<T>(T testCallbacks) where T : ICallbacks
         {

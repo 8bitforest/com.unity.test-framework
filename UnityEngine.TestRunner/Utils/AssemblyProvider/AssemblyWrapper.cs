@@ -8,9 +8,12 @@ namespace UnityEngine.TestTools.Utils
         public AssemblyWrapper(Assembly assembly)
         {
             Assembly = assembly;
+            Name = assembly.GetName();
         }
 
         public Assembly Assembly { get; }
+
+        public AssemblyName Name { get; }
 
         public virtual string Location
         {

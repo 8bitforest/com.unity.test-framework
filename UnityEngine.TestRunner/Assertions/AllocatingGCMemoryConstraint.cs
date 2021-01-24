@@ -83,7 +83,7 @@ namespace UnityEngine.TestTools.Constraints
         /// <summary>
         /// Applies GC memory constraint to the test.
         /// </summary>
-        /// <param name="del">An ActualValueDelegate</param>
+        /// <param name="obj">An object to apply the GC constraint to. Should be a <see cref="TestDelegate"/>.</param>
         /// <returns>A ConstraintResult</returns>
         /// <exception cref="ArgumentNullException">Throws a <see cref="ArgumentNullException"/> if the provided object is null.</exception>
         /// <exception cref="ArgumentException">Throws a <see cref="ArgumentException"/> if the provided object is not a <see cref="TestDelegate"/>.</exception>
@@ -105,6 +105,7 @@ namespace UnityEngine.TestTools.Constraints
         /// The default implementation simply dereferences the value but
         /// derived classes may override it to provide for delayed processing.
         /// </summary>
+        /// <typeparam name="TActual">The type of the actual value delegate to be tested.</typeparam>
         /// <param name="del">A reference to the value delegate to be tested</param>
         /// <returns>A ConstraintResult</returns>
         /// <exception cref="ArgumentNullException">Throws a <see cref="ArgumentNullException"/> if the provided delegate is null.</exception>

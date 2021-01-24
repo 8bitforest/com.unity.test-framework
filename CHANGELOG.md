@@ -1,4 +1,21 @@
 # Changelog
+## [1.1.22] - 2021-01-21
+- Fixed issue where test result of an explicit test was set to skipped in case it was passing and running from command line with testfilter set to the explicit test (DS-1236).
+- Fixed an issue where tests located in assemblies that did not directly reference any test assemblies were not included (DSTR-30).
+- Fixed an issue where UnitySetup methods were incorrectly being rerun when entering playmode, rather than being skipped (DSTR-68).
+- Internal: Remove ##utp message AssemblyCompilationErrors (DS-1277)
+- Fixed issue where if the timeout was exceeded in SetUp the timeout exception was not thrown(DSTR-21).
+- Removed ability to `Enable playmode tests for all assemblies` from the TestRunner UI, since it is a deprecated behavior. It enforces to use of assembly definition files (DSTR-45).
+- Fixed typo in `LogAssert.cs` documentation.
+
+## [1.1.21] - 2021-01-14
+- Fixed issue where test result of an explicit test was set to skipped in case it was passing and running from command line with testfilter set to the explicit test (DS-1236).
+- Fixed an issue where tests located in assemblies that did not directly reference any test assemblies were not included (DSTR-30).
+- Fixed an issue where UnitySetup methods were incorrectly being rerun when entering playmode, rather than being skipped (DSTR-68).
+- Internal: Remove ##utp message AssemblyCompilationErrors (DS-1277)
+- Fixed issue where if the timeout was exceeded in SetUp the timeout exception was not thrown(DSTR-21).
+- Removed ability to `Enable playmode tests for all assemblies` from the TestRunner UI, since it is a deprecated behavior. It enforces to use of assembly definition files (DSTR-45).
+
 ## [1.1.20] - 2020-12-04
 - The logscope is now available in OneTimeTearDown.
 - Fixed an issue where failing tests would not result in the correct exit code if a domain reload happens after the test has run (DS-1304).
@@ -8,7 +25,6 @@
 - Fixed OpenSource in case of a Test in a nested class (DSTR-6)
 - UnityTests with a domain reload now works correctly in combination with Retry and Repeat attributes (DS-428).
 - Fixed OpenSource in case of Tests located inside a package (DS-432)
-- Update `com.unity.ext.nunit` version to 1.0.6
 
 ## [1.1.19] - 2020-11-17
 - Command line runs with an inconclusive test result now exit with exit code 2 (case DS-951).

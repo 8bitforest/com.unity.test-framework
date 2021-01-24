@@ -12,6 +12,9 @@ namespace UnityEngine.TestTools
     /// </summary>
     public static class LogAssert
     {
+        /// <summary>
+        /// Verifies that a log message of a specified type appears in the log. A test won't fail from an expected error, assertion, or exception log message. It does fail if an expected message does not appear in the log.
+        /// </summary>
         /// <param name="type">A type of log to expect. It can take one of the [LogType enum](https://docs.unity3d.com/ScriptReference/LogType.html) values.</param>
         /// <param name="message">A string value that should equate to the expected message.</param>
         /// <example>
@@ -54,7 +57,8 @@ namespace UnityEngine.TestTools
         {
             LogScope.Current.NoUnexpectedReceived();
         }
-        /// <returns>Set this property to `true` to prevent unexpected error log messages from triggering an assertion. By default, it is `false`.</returns>
+        /// <summary>Set this property to `true` to prevent unexpected error log messages from triggering an assertion. By default, it is `false`.</summary>
+        /// <returns>The value of the ignoreFailingMessages boolean property.</returns>
         public static bool ignoreFailingMessages
         {
             get

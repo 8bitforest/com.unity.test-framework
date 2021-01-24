@@ -20,7 +20,7 @@ namespace UnityEngine.TestTools
     /// [UnityTest]
     /// public IEnumerator EditorUtility_WhenExecuted_ReturnsSuccess()
     /// {
-    ///     var utility = RunEditorUtilityInTheBackgroud();
+    ///     var utility = RunEditorUtilityInTheBackground();
     /// 
     ///     while (utility.isRunning)
     ///     {
@@ -36,7 +36,7 @@ namespace UnityEngine.TestTools
     /// 
     /// In Play Mode, a test runs as a coroutine attached to a [MonoBehaviour](https://docs.unity3d.com/ScriptReference/MonoBehaviour.html). So all the yield instructions available in coroutines, are also available in your test. 
     /// 
-    /// From a Play Mode test you can use one of Unity’s [Yield Instructions](https://docs.unity3d.com/ScriptReference/YieldInstruction.html):
+    /// From a Play Mode test you can use one of Unity's [Yield Instructions](https://docs.unity3d.com/ScriptReference/YieldInstruction.html):
     /// 
     /// - [WaitForFixedUpdate](https://docs.unity3d.com/ScriptReference/WaitForFixedUpdate.html): to ensure changes expected within the next cycle of physics calculations.
     /// - [WaitForSeconds](https://docs.unity3d.com/ScriptReference/WaitForSeconds.html): if you want to pause your test coroutine for a fixed amount of time. Be careful about creating long-running tests.
@@ -60,6 +60,9 @@ namespace UnityEngine.TestTools
     [AttributeUsage(AttributeTargets.Method)]
     public class UnityTestAttribute : CombiningStrategyAttribute, ISimpleTestBuilder, IImplyFixture
     {
+        /// <summary>
+        /// Initializes and returns an instance of UnityTestAttribute.
+        /// </summary>
         public UnityTestAttribute() : base(new UnityCombinatorialStrategy(), new ParameterDataSourceProvider()) {}
 
         private readonly NUnitTestCaseBuilder _builder = new NUnitTestCaseBuilder();

@@ -42,7 +42,8 @@ namespace UnityEngine.TestTools
             var unityContext = (UnityTestExecutionContext)context;
             var state = GetState(unityContext);
 
-            if (state == null)
+            // When entering PlayMode state will incorrectly be seen as null. Looking at the hashcode to be certain that it is null.
+            if (state?.GetHashCode() == null)
             {
                 // We do not expect a state to exist in playmode
                 state = ScriptableObject.CreateInstance<BeforeAfterTestCommandState>();

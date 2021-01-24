@@ -8,9 +8,9 @@ namespace UnityEngine.TestTools.Utils
     public class Vector3ComparerWithEqualsOperator : IEqualityComparer<Vector3>
     {
         private static readonly Vector3ComparerWithEqualsOperator m_Instance = new Vector3ComparerWithEqualsOperator();
-        /// <returns>
+        /// <summary>
         /// A singleton instance of the comparer with a predefined default error value.
-        /// </returns>
+        /// </summary>
         public static Vector3ComparerWithEqualsOperator Instance { get { return m_Instance; } }
 
         private Vector3ComparerWithEqualsOperator() {}

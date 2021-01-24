@@ -11,13 +11,18 @@ namespace UnityEngine.TestTools
     /// </summary>
     public interface IEditModeTestYieldInstruction
     {
-        /// <returns> Returns true if the instruction expects a domain reload to occur</returns>
+        /// <summary>
+        /// Whether or not the instruction expects a domain reload to occur.
+        /// </summary>
         bool ExpectDomainReload { get; }
-        /// <returns>
-        /// Returns true if the instruction expects the Unity Editor to be in **Play Mode**.
-        /// </returns>
+        /// <summary>
+        /// Whether or not the instruction expects the Unity Editor to be in **Play Mode**.
+        /// </summary>
         bool ExpectedPlaymodeState { get; }
-        /// <returns> Used to define multi-frame operations performed when instantiating a yield instruction.</returns>
+        /// <summary>
+        ///  Used to define multi-frame operations performed when instantiating a yield instruction.
+        /// </summary>
+        /// <returns>Enumerable collection of operations to perform.</returns>
         IEnumerator Perform();
     }
 }

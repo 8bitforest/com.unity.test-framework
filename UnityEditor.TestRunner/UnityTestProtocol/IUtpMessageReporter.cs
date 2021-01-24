@@ -6,7 +6,6 @@ namespace UnityEditor.TestTools.TestRunner.UnityTestProtocol
 {
     internal interface IUtpMessageReporter
     {
-        void ReportAssemblyCompilationErrors(string assembly, IEnumerable<CompilerMessage> errorCompilerMessages);
         void ReportTestFinished(ITestResultAdaptor result);
         void ReportTestRunStarted(ITestAdaptor testsToRun);
         void ReportTestStarted(ITestAdaptor test);

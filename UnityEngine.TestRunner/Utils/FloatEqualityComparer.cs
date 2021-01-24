@@ -11,18 +11,17 @@ namespace UnityEngine.TestTools.Utils
         private readonly float AllowedError;
 
         private static readonly  FloatEqualityComparer m_Instance = new FloatEqualityComparer();
-        /// <returns>
+        /// <summary>
         ///A singleton instance of the comparer with a default error value set to 0.0001f.
-        /// </returns>
+        /// </summary>
         public static FloatEqualityComparer Instance { get { return m_Instance; } }
 
         private FloatEqualityComparer() : this(k_DefaultError) {}
 
         /// <summary>
-        /// Creates an instance of the comparer with a custom error value.
+        /// Initializes an instance of a FloatEqualityComparer with a custom error value instead of the default 0.0001f.
         /// </summary>
         /// <param name="allowedError">The custom error value</param>
-        /// <returns>A FloatEqualityComparer object with allowedError as error value instead of the custom 0.0001f</returns>
         public FloatEqualityComparer(float allowedError)
         {
             this.AllowedError = allowedError;

@@ -6,11 +6,11 @@ namespace UnityEngine.TestTools
     /// <typeparam name="T">A MonoBehaviour component created for the test and attached to the tests [GameObject](https://docs.unity3d.com/ScriptReference/GameObject.html).</typeparam>
     public class MonoBehaviourTest<T> : CustomYieldInstruction where T : MonoBehaviour, IMonoBehaviourTest
     {
-        /// <returns>A MonoBehaviour component created for the test and attached to the tests [GameObject](https://docs.unity3d.com/ScriptReference/GameObject.html).</returns>
+        /// <summary>A MonoBehaviour component created for the test and attached to the tests [GameObject](https://docs.unity3d.com/ScriptReference/GameObject.html).</summary>
         public T component { get; }
-        /// <returns>
+        /// <summary>
         /// A `GameObject` created as a container for the test component.
-        /// </returns>
+        /// </summary>
         public GameObject gameObject { get { return component.gameObject; } }
         /// <summary>
         /// `MonoBehaviourTest` is a [coroutine](https://docs.unity3d.com/ScriptReference/Coroutine.html) and a helper for writing MonoBehaviour tests.
@@ -49,9 +49,9 @@ namespace UnityEngine.TestTools
                 Object.DontDestroyOnLoad(go);
             }
         }
-        /// <returns>
+        /// <summary>
         /// (Inherited) Returns `true`` if the test is not finished yet, which keeps the coroutine suspended
-        /// </returns>
+        /// </summary>
         public override bool keepWaiting
         {
             get { return !component.IsTestFinished; }

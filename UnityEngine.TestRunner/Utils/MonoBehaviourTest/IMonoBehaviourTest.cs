@@ -5,7 +5,7 @@ namespace UnityEngine.TestTools
     /// </summary>
     public interface IMonoBehaviourTest
     {
-        /// <returns> true when the test is considered finished.</returns>
+        /// <summary>True when the test is considered finished.</summary>
         bool IsTestFinished {get; }
     }
 }

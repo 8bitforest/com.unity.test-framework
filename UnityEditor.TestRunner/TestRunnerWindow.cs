@@ -32,7 +32,6 @@ namespace UnityEditor.TestTools.TestRunner
 
         private readonly GUIContent m_GUIHorizontalSplit = EditorGUIUtility.TrTextContent("Horizontal layout");
         private readonly GUIContent m_GUIVerticalSplit = EditorGUIUtility.TrTextContent("Vertical layout");
-        private readonly GUIContent m_GUIEnableaPlaymodeTestsRunner = EditorGUIUtility.TrTextContent("Enable playmode tests for all assemblies");
         private readonly GUIContent m_GUIDisablePlaymodeTestsRunner = EditorGUIUtility.TrTextContent("Disable playmode tests for all assemblies");
         private readonly GUIContent m_GUIRunPlayModeTestAsEditModeTests = EditorGUIUtility.TrTextContent("Run playmode tests as editmode tests");
 
@@ -73,11 +72,6 @@ namespace UnityEditor.TestTools.TestRunner
         {
             s_Instance = GetWindow<TestRunnerWindow>("Test Runner");
             s_Instance.Show();
-        }
-
-        internal static void ShowPlaymodeTestsRunnerWindowCodeBased()
-        {
-            ShowWindow();
         }
 
         static TestRunnerWindow()
@@ -236,10 +230,7 @@ namespace UnityEditor.TestTools.TestRunner
             menu.AddItem(m_GUIHorizontalSplit, !m_Settings.verticalSplit, m_Settings.ToggleVerticalSplit);
 
             menu.AddSeparator(null);
-
-            var playModeTestRunnerEnabled = PlayerSettings.playModeTestRunnerEnabled;
-            var currentActive = playModeTestRunnerEnabled ? m_GUIDisablePlaymodeTestsRunner : m_GUIEnableaPlaymodeTestsRunner;
-
+            
             if (EditorPrefs.GetBool("InternalMode", false))
             {
                 menu.AddItem(m_GUIRunPlayModeTestAsEditModeTests, PlayerSettings.runPlayModeTestAsEditModeTest, () =>
@@ -248,11 +239,11 @@ namespace UnityEditor.TestTools.TestRunner
                 });
             }
 
-            menu.AddItem(currentActive, false, () =>
+            if (PlayerSettings.playModeTestRunnerEnabled)
             {
-                PlayerSettings.playModeTestRunnerEnabled = !playModeTestRunnerEnabled;
-                EditorUtility.DisplayDialog(currentActive.text, "You need to restart the editor now", "Ok");
-            });
+                PlayerSettings.playModeTestRunnerEnabled = false;
+                EditorUtility.DisplayDialog(m_GUIDisablePlaymodeTestsRunner.text, "You need to restart the editor now", "Ok");
+            }
         }
 
         internal void RebuildUIFilter()
