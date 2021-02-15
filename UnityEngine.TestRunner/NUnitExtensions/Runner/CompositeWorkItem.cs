@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
@@ -21,8 +22,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         private readonly ITestFilter _childFilter;
         private TestCommand _setupCommand;
         private TestCommand _teardownCommand;
-        private MethodInfo _unityOneTimeSetUp;
-        private MethodInfo _unityOneTimeTearDown;
+        private MethodInfo _unitySetupMethod;
+        private MethodInfo _unityTeardownMethod;
+        private MethodInfo _asyncSetupMethod;
+        private MethodInfo _asyncTeardownMethod;
 
         public List<UnityWorkItem> Children { get; private set; }
 
@@ -69,8 +72,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                     //If we do not, the objects could be automatically destroyed when exiting playmode and could result in errors later on
                                     yield return null;
                                     PerformOneTimeSetUp();
-                                    if (_unityOneTimeSetUp != null)
-                                        yield return Reflect.InvokeMethod(_unityOneTimeSetUp, Context.TestObject);
+                                    if (_unitySetupMethod != null)
+                                        yield return Reflect.InvokeMethod(_unitySetupMethod, Context.TestObject);
+                                    if (_asyncSetupMethod != null)
+                                        yield return new TestTask(UnityTestExecutionContext.CurrentContext,
+                                                Reflect.InvokeMethod(_asyncSetupMethod, Context.TestObject) as Task)
+                                            .Execute();
                                 }
 
                                 if (!CheckForCancellation())
@@ -98,8 +105,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
                                 if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested && !m_DontRunRestoringResult)
                                 {
-                                    if (_unityOneTimeTearDown != null) 
-                                        yield return Reflect.InvokeMethod(_unityOneTimeTearDown, Context.TestObject);
+                                    if (_asyncTeardownMethod != null)
+                                        yield return new TestTask(UnityTestExecutionContext.CurrentContext,
+                                                Reflect.InvokeMethod(_asyncTeardownMethod, Context.TestObject) as Task)
+                                            .Execute();
+                                    if (_unityTeardownMethod != null)
+                                        yield return Reflect.InvokeMethod(_unityTeardownMethod, Context.TestObject);
                                     PerformOneTimeTearDown();
                                 }
                             }
@@ -161,12 +172,19 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
             if (_suite.TypeInfo != null)
             {
-                _unityOneTimeSetUp = Reflect
+                // Only supports one OneTimeSetUpTearDown method at a time, but that's good enough
+                _unitySetupMethod = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(UnityOneTimeSetUpAttribute), true)
                     .FirstOrDefault(m => m.ReturnType == typeof(IEnumerator));
-                _unityOneTimeTearDown = Reflect
+                _unityTeardownMethod = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(UnityOneTimeTearDownAttribute), true)
                     .FirstOrDefault(m => m.ReturnType == typeof(IEnumerator));
+                _asyncSetupMethod = Reflect
+                    .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(AsyncOneTimeSetUpAttribute), true)
+                    .FirstOrDefault(m => m.ReturnType == typeof(Task));
+                _asyncTeardownMethod = Reflect
+                    .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(AsyncOneTimeTearDownAttribute), true)
+                    .FirstOrDefault(m => m.ReturnType == typeof(Task));
             }
         }
 

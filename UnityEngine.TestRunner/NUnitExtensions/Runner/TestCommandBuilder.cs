@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
@@ -20,15 +21,20 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             }
 
             var testReturnsIEnumerator = test.Method.ReturnType.Type == typeof(IEnumerator); 
+            var testReturnsTask = test.Method.ReturnType.Type == typeof(Task);
             
             TestCommand command;
-            if (!testReturnsIEnumerator)
+            if (testReturnsIEnumerator)
             {
-                command = new TestMethodCommand(test);    
+                command = new EnumerableTestMethodCommand(test);
+            }
+            else if (testReturnsTask)
+            {
+                command = new AsyncTestMethodCommand(test);
             }
             else
             {
-                command = new EnumerableTestMethodCommand(test);
+                command = new TestMethodCommand(test);
             }
             
             command = new UnityLogCheckDelegatingCommand(command);
@@ -60,7 +66,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             command = new UnityEngine.TestTools.TestActionCommand(command);
             command = new UnityEngine.TestTools.SetUpTearDownCommand(command);
             
-            if (!testReturnsIEnumerator)
+            if (!testReturnsIEnumerator && !testReturnsTask)
             {
                 command = new ImmediateEnumerableCommand(command);    
             }
@@ -91,6 +97,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             }
 
             command = new EnumerableSetUpTearDownCommand(command);
+            command = new AsyncSetUpTearDownCommand(command);
             command = new OuterUnityTestActionCommand(command);
 
             IApplyToContext[] changes = test.Method.GetCustomAttributes<IApplyToContext>(true);

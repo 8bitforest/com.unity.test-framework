@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 
@@ -38,6 +39,15 @@ namespace UnityEngine.TestTools.TestRunner.GUI
                 if (Reflect.GetMethodsWithAttribute(test.TypeInfo.Type, typeof(UnityTearDownAttribute), true)
                     .Any(mi => mi.ReturnType == typeof(System.Collections.IEnumerator)))
                     return false;
+                
+                if (Reflect.GetMethodsWithAttribute(test.TypeInfo.Type, typeof(AsyncSetUpAttribute), true)
+                    .Any(mi => mi.ReturnType == typeof(Task)))
+                    return false;
+                
+                if (Reflect.GetMethodsWithAttribute(test.TypeInfo.Type, typeof(AsyncTearDownAttribute), true)
+                    .Any(mi => mi.ReturnType == typeof(Task)))
+                    return false;
+
             }
 
             return true;
