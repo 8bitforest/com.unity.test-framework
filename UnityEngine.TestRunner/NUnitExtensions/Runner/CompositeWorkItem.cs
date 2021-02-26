@@ -75,9 +75,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                     if (_unitySetupMethod != null)
                                         yield return Reflect.InvokeMethod(_unitySetupMethod, Context.TestObject);
                                     if (_asyncSetupMethod != null)
-                                        yield return new TestTask(UnityTestExecutionContext.CurrentContext,
-                                                Reflect.InvokeMethod(_asyncSetupMethod, Context.TestObject) as Task)
-                                            .Execute();
+                                        yield return WaitForTask(
+                                            Reflect.InvokeMethod(_asyncSetupMethod, Context.TestObject) as Task);
                                 }
 
                                 if (!CheckForCancellation())
@@ -106,9 +105,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                 if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested && !m_DontRunRestoringResult)
                                 {
                                     if (_asyncTeardownMethod != null)
-                                        yield return new TestTask(UnityTestExecutionContext.CurrentContext,
-                                                Reflect.InvokeMethod(_asyncTeardownMethod, Context.TestObject) as Task)
-                                            .Execute();
+                                        yield return WaitForTask(
+                                            Reflect.InvokeMethod(_asyncTeardownMethod, Context.TestObject) as Task);
                                     if (_unityTeardownMethod != null)
                                         yield return Reflect.InvokeMethod(_unityTeardownMethod, Context.TestObject);
                                     PerformOneTimeTearDown();
@@ -389,6 +387,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 if (child.State == WorkItemState.Running)
                     child.Cancel(force);
             }
+        }
+
+        private IEnumerable WaitForTask(Task task)
+        {
+            while (!task.IsCompleted)
+                yield return null;
         }
     }
 }
