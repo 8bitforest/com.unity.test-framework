@@ -22,10 +22,10 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         private readonly ITestFilter _childFilter;
         private TestCommand _setupCommand;
         private TestCommand _teardownCommand;
-        private MethodInfo _unitySetupMethod;
-        private MethodInfo _unityTeardownMethod;
-        private MethodInfo _asyncSetupMethod;
-        private MethodInfo _asyncTeardownMethod;
+        private MethodInfo[] _unitySetupMethods;
+        private MethodInfo[] _unityTeardownMethods;
+        private MethodInfo[] _asyncSetupMethods;
+        private MethodInfo[] _asyncTeardownMethods;
 
         public List<UnityWorkItem> Children { get; private set; }
 
@@ -72,11 +72,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                     //If we do not, the objects could be automatically destroyed when exiting playmode and could result in errors later on
                                     yield return null;
                                     PerformOneTimeSetUp();
-                                    if (_unitySetupMethod != null)
-                                        yield return Reflect.InvokeMethod(_unitySetupMethod, Context.TestObject);
-                                    if (_asyncSetupMethod != null)
-                                        yield return WaitForTask(
-                                            Reflect.InvokeMethod(_asyncSetupMethod, Context.TestObject) as Task);
+                                    if (_unitySetupMethods != null)
+                                        foreach (var method in _unitySetupMethods)
+                                            yield return Reflect.InvokeMethod(method, Context.TestObject);
+                                    if (_asyncSetupMethods != null)
+                                        foreach (var method in _asyncSetupMethods)
+                                            yield return WaitForTask(Reflect.InvokeMethod(method, Context.TestObject) as Task);
                                 }
 
                                 if (!CheckForCancellation())
@@ -104,11 +105,12 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
                                 if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested && !m_DontRunRestoringResult)
                                 {
-                                    if (_asyncTeardownMethod != null)
-                                        yield return WaitForTask(
-                                            Reflect.InvokeMethod(_asyncTeardownMethod, Context.TestObject) as Task);
-                                    if (_unityTeardownMethod != null)
-                                        yield return Reflect.InvokeMethod(_unityTeardownMethod, Context.TestObject);
+                                    if (_asyncTeardownMethods != null)
+                                        foreach (var method in _asyncTeardownMethods)
+                                            yield return WaitForTask(Reflect.InvokeMethod(method, Context.TestObject) as Task);
+                                    if (_unityTeardownMethods != null)
+                                        foreach (var method in _unityTeardownMethods)
+                                            yield return Reflect.InvokeMethod(method, Context.TestObject);
                                     PerformOneTimeTearDown();
                                 }
                             }
@@ -170,19 +172,18 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
             if (_suite.TypeInfo != null)
             {
-                // Only supports one OneTimeSetUpTearDown method at a time, but that's good enough
-                _unitySetupMethod = Reflect
+                _unitySetupMethods = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(UnityOneTimeSetUpAttribute), true)
-                    .FirstOrDefault(m => m.ReturnType == typeof(IEnumerator));
-                _unityTeardownMethod = Reflect
+                    .Where(m => m.ReturnType == typeof(IEnumerator)).ToArray();
+                _unityTeardownMethods = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(UnityOneTimeTearDownAttribute), true)
-                    .FirstOrDefault(m => m.ReturnType == typeof(IEnumerator));
-                _asyncSetupMethod = Reflect
+                    .Where(m => m.ReturnType == typeof(IEnumerator)).Reverse().ToArray();
+                _asyncSetupMethods = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(AsyncOneTimeSetUpAttribute), true)
-                    .FirstOrDefault(m => m.ReturnType == typeof(Task));
-                _asyncTeardownMethod = Reflect
+                    .Where(m => m.ReturnType == typeof(Task)).ToArray();
+                _asyncTeardownMethods = Reflect
                     .GetMethodsWithAttribute(_suite.TypeInfo.Type, typeof(AsyncOneTimeTearDownAttribute), true)
-                    .FirstOrDefault(m => m.ReturnType == typeof(Task));
+                    .Where(m => m.ReturnType == typeof(Task)).Reverse().ToArray();
             }
         }
 
@@ -389,7 +390,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
             }
         }
 
-        private IEnumerable WaitForTask(Task task)
+        private IEnumerator WaitForTask(Task task)
         {
             while (!task.IsCompleted)
                 yield return null;

@@ -32,16 +32,16 @@ namespace UnityEngine.TestTools
         protected override IEnumerator InvokeBefore(MethodInfo action, Test test, UnityTestExecutionContext context)
         {
             var task = Reflect.InvokeMethod(action, context.TestObject) as Task;
-            yield return WaitForTask(task);
+            return WaitForTask(task);
         }
 
         protected override IEnumerator InvokeAfter(MethodInfo action, Test test, UnityTestExecutionContext context)
         {
             var task = Reflect.InvokeMethod(action, context.TestObject) as Task;
-            yield return WaitForTask(task);
+            return WaitForTask(task);
         }
 
-        private IEnumerable WaitForTask(Task task)
+        private IEnumerator WaitForTask(Task task)
         {
             while (!task.IsCompleted)
                 yield return null;
