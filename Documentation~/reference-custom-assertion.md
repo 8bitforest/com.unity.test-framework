@@ -28,7 +28,7 @@ public void LogAssertExample()
 
 ## LogAssert
 
-`LogAssert` lets you expect Unity log messages that would otherwise cause the test to fail.
+`LogAssert` lets you expect Unity log messages that would otherwise cause the test to fail. It is available under the namespace `UnityEngine.TestTools`, see the Scripting API for more details.
 
 ### Static properties
 

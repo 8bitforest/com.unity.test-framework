@@ -28,6 +28,10 @@ namespace UnityEngine.TestTools
         public IEnumerable ExecuteEnumerable(ITestExecutionContext context)
         {
             var unityContext = (UnityTestExecutionContext)context;
+            if (unityContext.EnumerableTestState?.GetHashCode() == null)
+            {
+                unityContext.EnumerableTestState = new EnumerableTestState();
+            }
             int count = unityContext.EnumerableTestState.Repeat;
             var firstCycleAfterResume = count > 0;
 

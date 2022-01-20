@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -11,26 +10,16 @@ namespace UnityEngine.TestTools
 {
     internal class TestActionCommand : BeforeAfterTestCommandBase<ITestAction>
     {
+        static readonly Dictionary<MethodInfo, List<ITestAction>> m_TestActionsCache = new Dictionary<MethodInfo, List<ITestAction>>();
+
         public TestActionCommand(TestCommand innerCommand)
             : base(innerCommand, "BeforeTest", "AfterTest", true)
         {
             if (Test.TypeInfo.Type != null)
             {
-                BeforeActions = GetTestActionsFromMethod(Test.Method.MethodInfo);
+                BeforeActions = GetTestActions(m_TestActionsCache, Test.Method.MethodInfo);
                 AfterActions = BeforeActions;
             }
-        }
-
-        private static ITestAction[] GetTestActionsFromMethod(MethodInfo method)
-        {
-            var attributes = method.GetCustomAttributes(false);
-            List<ITestAction> actions = new List<ITestAction>();
-            foreach (var attribute in attributes)
-            {
-                if (attribute is ITestAction)
-                    actions.Add(attribute as ITestAction);
-            }
-            return actions.ToArray();
         }
 
         protected override IEnumerator InvokeBefore(ITestAction action, Test test, UnityTestExecutionContext context)

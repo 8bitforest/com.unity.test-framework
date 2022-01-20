@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using UnityEngine.TestRunner.NUnitExtensions.Filters;
@@ -101,7 +102,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions
             return id;
         }
 
-        public static string GetFullName(ITest test)
+        public static string GetFullName(this ITest test)
         {
             var typeInfo = test.TypeInfo ?? test.Parent?.TypeInfo ?? test.Tests.FirstOrDefault()?.TypeInfo;
             if (typeInfo == null)
@@ -116,6 +117,26 @@ namespace UnityEngine.TestRunner.NUnitExtensions
             }
             
             return string.Format("[{0}][{1}]", assemblyId, test.FullName);
+        }
+        
+        public static string GetFullNameWithoutDllPath(this ITest test)
+        {
+            if (test.Parent == null)
+            {
+                return string.Empty;
+            }
+            var typeInfo = test.TypeInfo ?? test.Parent?.TypeInfo;
+            if (typeInfo == null && IsAssembly(test))
+            {
+                return test.Name;
+            }
+
+            return test.FullName;
+        }
+
+        private static bool IsAssembly(this ITest test)
+        {
+            return test.Parent.Parent == null;
         }
 
         public static string GetSkipReason(this ITest test)

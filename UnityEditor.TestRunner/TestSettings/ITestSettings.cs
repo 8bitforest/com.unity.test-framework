@@ -16,6 +16,8 @@ namespace UnityEditor.TestTools.TestRunner
         string iOSManualProvisioningProfileID { get; set; }
         ProvisioningProfileType? tvOSManualProvisioningProfileType { get; set; }
         string tvOSManualProvisioningProfileID { get; set; }
+        string[] playerGraphicsAPIs { get; set; }
+        bool autoGraphicsAPIs { get; set; }
 
         void SetupProjectParameters();
     }

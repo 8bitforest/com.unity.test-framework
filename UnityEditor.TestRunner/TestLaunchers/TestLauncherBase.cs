@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using NUnit.Framework.Interfaces;
+using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.TestTools;
 using UnityEngine.TestTools.Logging;
 using UnityEngine.TestTools.TestRunner;
@@ -19,21 +21,26 @@ namespace UnityEditor.TestTools.TestRunner
 
         protected bool ExecutePreBuildSetupMethods(ITest tests, ITestFilter testRunnerFilter)
         {
-            var attributeFinder = new PrebuildSetupAttributeFinder();
-            var logString = "Executing setup for: {0}";
-            return ExecuteMethods<IPrebuildSetup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Setup(), TestTargetPlatform);
+            using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto()) {
+                var attributeFinder = new PrebuildSetupAttributeFinder();
+                var logString = "Executing setup for: {0}";
+                return ExecuteMethods<IPrebuildSetup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Setup(), TestTargetPlatform);
+            }
         }
 
         public void ExecutePostBuildCleanupMethods(ITest tests, ITestFilter testRunnerFilter)
         {
-            ExecutePostBuildCleanupMethods(tests, testRunnerFilter, TestTargetPlatform);
+            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto())
+                ExecutePostBuildCleanupMethods(tests, testRunnerFilter, TestTargetPlatform);
         }
 
         public static void ExecutePostBuildCleanupMethods(ITest tests, ITestFilter testRunnerFilter, RuntimePlatform? testTargetPlatform)
         {
-            var attributeFinder = new PostbuildCleanupAttributeFinder();
-            var logString = "Executing cleanup for: {0}";
-            ExecuteMethods<IPostBuildCleanup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Cleanup(), testTargetPlatform);
+            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto()) {
+                var attributeFinder = new PostbuildCleanupAttributeFinder();
+                var logString = "Executing cleanup for: {0}";
+                ExecuteMethods<IPostBuildCleanup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Cleanup(), testTargetPlatform);
+            }
         }
 
         private static bool ExecuteMethods<T>(ITest tests, ITestFilter testRunnerFilter, AttributeFinderBase attributeFinder, string logString, Action<T> action, RuntimePlatform? testTargetPlatform)

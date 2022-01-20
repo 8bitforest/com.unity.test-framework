@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
@@ -12,7 +14,7 @@ using UnityEngine.TestTools.TestRunner;
 
 namespace UnityEngine.TestTools
 {
-    internal abstract class BeforeAfterTestCommandBase<T> : DelegatingTestCommand, IEnumerableTestMethodCommand
+    internal abstract class BeforeAfterTestCommandBase<T> : DelegatingTestCommand, IEnumerableTestMethodCommand where T : class
     {
         private string m_BeforeErrorPrefix;
         private string m_AfterErrorPrefix;
@@ -30,10 +32,60 @@ namespace UnityEngine.TestTools
         protected T[] BeforeActions = new T[0];
 
         protected T[] AfterActions = new T[0];
+        
+        protected static MethodInfo[] GetActions(IDictionary<Type, List<MethodInfo>> cacheStorage, Type fixtureType, Type attributeType, Type returnType)
+        {
+            if (cacheStorage.TryGetValue(fixtureType, out var result))
+            {
+                return result.ToArray();
+            }
+            
+            cacheStorage[fixtureType] = GetMethodsWithAttributeFromFixture(fixtureType,  attributeType, returnType);
+            
+            return cacheStorage[fixtureType].ToArray();
+        }
+        
+        protected static T[] GetTestActions(IDictionary<MethodInfo,  List<T>> cacheStorage, MethodInfo methodInfo) 
+        {
+            if (cacheStorage.TryGetValue(methodInfo, out var result))
+            {
+                return result.ToArray();
+            }
+
+            var attributesForMethodInfo = new List<T>();
+            var attributes = methodInfo.GetCustomAttributes(false);
+            foreach (var attribute in attributes)
+            {
+                if (attribute is T attribute1)
+                {
+                    attributesForMethodInfo.Add(attribute1);
+                }
+            }
+            
+            cacheStorage[methodInfo] = attributesForMethodInfo;
+            
+            return cacheStorage[methodInfo].ToArray();
+        }
+    
+        private static List<MethodInfo> GetMethodsWithAttributeFromFixture(Type fixtureType, Type setUpType, Type returnType)
+        {
+            MethodInfo[] methodsWithAttribute = Reflect.GetMethodsWithAttribute(fixtureType, setUpType, true);
+            return methodsWithAttribute.Where(x => x.ReturnType == returnType).ToList();
+        }
 
         protected abstract IEnumerator InvokeBefore(T action, Test test, UnityTestExecutionContext context);
 
         protected abstract IEnumerator InvokeAfter(T action, Test test, UnityTestExecutionContext context);
+
+        protected virtual bool MoveBeforeEnumerator(IEnumerator enumerator, Test test)
+        {
+            return enumerator.MoveNext();
+        }
+
+        protected virtual bool MoveAfterEnumerator(IEnumerator enumerator, Test test)
+        {
+            return enumerator.MoveNext();
+        }
 
         protected abstract BeforeAfterTestCommandState GetState(UnityTestExecutionContext context);
 
@@ -98,7 +150,7 @@ namespace UnityEngine.TestTools
                             yield return enumerator.Current;
                         }
 
-                        if (GetUtcNow() - state.Timestamp > unityContext.TestCaseTimeout)
+                        if (GetUtcNow() - state.Timestamp > unityContext.TestCaseTimeout || CoroutineTimedOut(unityContext))
                         {
                             context.CurrentResult.RecordPrefixedError(m_BeforeErrorPrefix, new UnityTestTimeoutException(unityContext.TestCaseTimeout).Message);
                             state.TestHasRun = true;
@@ -177,7 +229,8 @@ namespace UnityEngine.TestTools
                         state.NextAfterStepPc = ActivePcHelper.GetEnumeratorPC(enumerator);
                         state.StoreTestResult(context.CurrentResult);
                         
-                        if (GetUtcNow() - state.Timestamp > unityContext.TestCaseTimeout)
+
+                        if (GetUtcNow() - state.Timestamp > unityContext.TestCaseTimeout || CoroutineTimedOut(unityContext))
                         {
                             context.CurrentResult.RecordPrefixedError(m_AfterErrorPrefix, new UnityTestTimeoutException(unityContext.TestCaseTimeout).Message);
                             yield break;
@@ -214,6 +267,16 @@ namespace UnityEngine.TestTools
         }
 
         private static TestCommandPcHelper pcHelper;
+        private static bool CoroutineTimedOut(ITestExecutionContext unityContext)
+        {
+            if (string.IsNullOrEmpty(unityContext.CurrentResult.Message))
+            {
+                return false;
+            }
+            return unityContext.CurrentResult.ResultState.Equals(ResultState.Failure) &&
+                       unityContext.CurrentResult.Message.Contains(new UnityTestTimeoutException(unityContext.TestCaseTimeout).Message);
+        }
+
 
         internal static TestCommandPcHelper ActivePcHelper
         {

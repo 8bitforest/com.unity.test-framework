@@ -1,97 +1,31 @@
 # Actions outside of tests
 
-When writing tests, it is possible to avoid duplication of code by using the [SetUp and TearDown](https://github.com/nunit/docs/wiki/SetUp-and-TearDown) methods built into [NUnit](http://www.nunit.org/). The Unity Test Framework has extended these methods with extra functionality, which can yield commands and skip frames, in the same way as [UnityTest](./reference-attribute-unitytest.md).
+When writing tests, it is possible to avoid duplication of code by using the [SetUp and TearDown](https://docs.nunit.org/articles/nunit/technical-notes/usage/SetUp-and-TearDown.html) methods built into [NUnit](http://www.nunit.org/). The Unity Test Framework has extended these methods with extra functionality, which can yield commands and skip frames, in the same way as [UnityTest](./reference-attribute-unitytest.md).
 
 ## Action execution order
 
 The actions related to a test run in the following order:
 
-* Attributes implementing [IApplyToContext](https://github.com/nunit/docs/wiki/IApplyToContext-Interface) 
-* Any attribute implementing [OuterUnityTestAction](#outerunitytestaction) has its `BeforeTest` invoked
-* Tests with [UnitySetUp](#unitysetup-and-unityteardown) methods in their test class.
-* Attributes implementing [IWrapSetUpTearDown](https://github.com/nunit/docs/wiki/ICommandWrapper-Interface) 
-* Any [SetUp](https://github.com/nunit/docs/wiki/SetUp-and-TearDown) attributes 
+* Attributes implementing [IApplyToContext](https://docs.nunit.org/articles/nunit/extending-nunit/IApplyToContext-Interface.html) 
+* Any attribute implementing [OuterUnityTestAction](./reference-outerunitytestaction.md) has its `BeforeTest` invoked
+* Tests with [UnitySetUp](./reference-unitysetup-and-unityteardown.md) methods in their test class
+* Attributes implementing [IWrapSetUpTearDown](https://docs.nunit.org/articles/nunit/extending-nunit/ICommandWrapper-Interface.html) 
+* Any method with the [SetUp]) attribute
 * [Action attributes](https://nunit.org/docs/2.6/actionAttributes.html) have their `BeforeTest` method invoked 
-* Attributes implementing of [IWrapTestMethod](https://github.com/nunit/docs/wiki/ICommandWrapper-Interface)  
+* Attributes implementing [IWrapTestMethod](https://docs.nunit.org/articles/nunit/extending-nunit/ICommandWrapper-Interface.html)  
 * **The test itself runs**
 * [Action attributes](https://nunit.org/docs/2.6/actionAttributes.html) have their `AfterTest` method invoked
-* Any method with the [TearDown](https://github.com/nunit/docs/wiki/SetUp-and-TearDown) attribute
-* Tests with [UnityTearDown](#unitysetup-and-unityteardown) methods in their test class
-* Any [OuterUnityTestAction](#outerunitytestaction) has its `AfterTest` invoked
+* Any method with the [TearDown](https://docs.nunit.org/articles/nunit/technical-notes/usage/SetUp-and-TearDown.html) attribute
+* Tests with [UnityTearDown](./reference-unitysetup-and-unityteardown.md) methods in their test class
+* Any [OuterUnityTestAction](./reference-outerunitytestaction.md) has its `AfterTest` invoked
 
 The list of actions is the same for both `Test` and `UnityTest`.
 
-## UnitySetUp and UnityTearDown
+### Execution order flow
 
-The `UnitySetUp` and `UnityTearDown` attributes are identical to the standard `SetUp` and `TearDown` attributes, with the exception that they allow for [yielding instructions](reference-custom-yield-instructions.md). The `UnitySetUp` and `UnityTearDown` attributes expect a return type of [IEnumerator](https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerator?view=netframework-4.8). 
+![Action Execution Order](./images/execution-order-full.svg)
 
-### Example
-
-```c#
-public class SetUpTearDownExample
-{
-    [UnitySetUp]
-    public IEnumerator SetUp()
-    {
-        yield return new EnterPlayMode();
-    }
-
-    [Test]
-    public void MyTest()
-    {
-        Debug.Log("This runs inside playmode");
-    }
-
-    [UnityTearDown]
-    public IEnumerator TearDown()
-    {
-
-        yield return new ExitPlayMode();
-    }
-}
-```
-
-
-
-## OuterUnityTestAction
-
-`OuterUnityTestAction` is a wrapper outside of the tests, which allows for any tests with this attribute to run code before and after the tests. This method allows for yielding commands in the same way as `UnityTest`. The attribute must inherit the `NUnit` attribute and implement `IOuterUnityTestAction`. 
-
-### Example
-
-```c#
-using System.Collections;
-using NUnit.Framework;
-using NUnit.Framework.Interfaces;
-using UnityEngine;
-using UnityEngine.TestTools;
-
-public class MyTestClass
-{
-    [UnityTest, MyOuterActionAttribute]
-    public IEnumerator MyTestInsidePlaymode()
-    {
-        Assert.IsTrue(Application.isPlaying);
-        yield return null;
-    }
-}
-
-public class MyOuterActionAttribute : NUnitAttribute, IOuterUnityTestAction
-{
-    public IEnumerator BeforeTest(ITest test)
-    {
-        yield return new EnterPlayMode();
-    }
-
-    public IEnumerator AfterTest(ITest test)
-    {
-        yield return new ExitPlayMode();
-    }
-}
-
-```
-
-
+> **Note**: Some browsers do not support SVG image files. If the image above does not display properly (for example, if you cannot see any text), please try another browser, such as [Google Chrome](https://www.google.com/chrome/) or [Mozilla Firefox](https://www.mozilla.org). 
 
 ## Domain Reloads
 

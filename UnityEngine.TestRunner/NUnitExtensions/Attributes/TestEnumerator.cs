@@ -3,6 +3,7 @@ using System.Collections;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
+using UnityEngine.TestRunner.NUnitExtensions;
 
 namespace UnityEngine.TestTools
 {
@@ -28,29 +29,65 @@ namespace UnityEngine.TestTools
         {
             m_Context.CurrentResult.SetResult(ResultState.Success);
 
+            return Execute(m_TestEnumerator, new EnumeratorContext(m_Context));
+        }
+
+        private IEnumerator Execute(IEnumerator enumerator, EnumeratorContext context)
+        {
             while (true)
             {
-                object current = null;
+                if (context.ExceptionWasRecorded)
+                {
+                    break;
+                }
+
                 try
                 {
-                    if (!m_TestEnumerator.MoveNext())
+                    if (!enumerator.MoveNext())
                     {
-                        yield break;
+                        break;
                     }
-
-                    if (!m_Context.CurrentResult.ResultState.Equals(ResultState.Success))
-                    {
-                        yield break;
-                    }
-
-                    current = m_TestEnumerator.Current;
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    m_Context.CurrentResult.RecordException(exception);
-                    yield break;
+                    context.RecordExceptionWithHint(ex);
+                    break;
                 }
-                yield return current;
+
+                if (enumerator.Current is IEnumerator nestedEnumerator)
+                {
+                    yield return Execute(nestedEnumerator, context);
+                }
+                else
+                {
+                    yield return enumerator.Current;
+                }
+            }
+        }
+
+        private class EnumeratorContext
+        {
+            private readonly ITestExecutionContext m_Context;
+
+            public EnumeratorContext(ITestExecutionContext context)
+            {
+                m_Context = context;
+            }
+
+            public bool ExceptionWasRecorded
+            {
+                get;
+                private set;
+            }
+
+            public void RecordExceptionWithHint(Exception ex)
+            {
+                if (ExceptionWasRecorded)
+                {
+                    return;
+                }
+                m_Context.CurrentResult.RecordException(ex);
+                ExceptionWasRecorded = true;
             }
         }
     }

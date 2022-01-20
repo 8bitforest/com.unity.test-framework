@@ -70,18 +70,21 @@ namespace UnityEditor.TestTools.TestRunner
             var filteredResults = new Dictionary<IAssemblyWrapper, bool>();
             foreach (var assembly in loadedAssemblies)
             {
-                FilterAssemblyForTestReference(assembly, loadedAssemblies, filteredResults);
+                FilterAssemblyForTestReference(assembly, loadedAssemblies, filteredResults, new Dictionary<IAssemblyWrapper, bool>());
             }
 
             return filteredResults.Where(pair => pair.Value).Select(pair => pair.Key).ToArray();
         }
         
-        private void FilterAssemblyForTestReference(IAssemblyWrapper assemblyToFilter, IAssemblyWrapper[] loadedAssemblies, IDictionary<IAssemblyWrapper, bool> filterResults)
+        private void FilterAssemblyForTestReference(IAssemblyWrapper assemblyToFilter, IAssemblyWrapper[] loadedAssemblies, 
+            IDictionary<IAssemblyWrapper, bool> filterResults, IDictionary<IAssemblyWrapper, bool> resultsAlreadyAnalyzed)
         {
-            if (filterResults.ContainsKey(assemblyToFilter))
+            if(resultsAlreadyAnalyzed.ContainsKey(assemblyToFilter))
             {
                 return;
             }
+
+            resultsAlreadyAnalyzed[assemblyToFilter] = true;
 
             var references = assemblyToFilter.GetReferencedAssemblies();
             if (references.Any(IsTestReference))
@@ -98,9 +101,9 @@ namespace UnityEditor.TestTools.TestRunner
                     continue;
                 }
 
-                FilterAssemblyForTestReference(referencedAssembly, loadedAssemblies, filterResults);
-
-                if (filterResults[referencedAssembly])
+                FilterAssemblyForTestReference(referencedAssembly, loadedAssemblies, filterResults, resultsAlreadyAnalyzed);
+                
+                if (filterResults.ContainsKey(referencedAssembly) && filterResults[referencedAssembly])
                 {
                     filterResults[assemblyToFilter] = true;
                     return;

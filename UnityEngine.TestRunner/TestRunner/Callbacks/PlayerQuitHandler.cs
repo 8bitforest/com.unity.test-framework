@@ -16,11 +16,13 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
             //Some platforms don't quit, so we need to disconnect to make sure they will not connect to another editor instance automatically.
             PlayerConnection.instance.DisconnectAll();
 
+#if !UNITY_2021_1_OR_NEWER
             //XBOX has an error when quitting
             if (Application.platform == RuntimePlatform.XboxOne)
             {
                 return;
             }
+#endif
             Application.Quit();
         }
 

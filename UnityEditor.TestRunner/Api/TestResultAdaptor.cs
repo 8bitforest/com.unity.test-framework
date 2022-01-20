@@ -9,6 +9,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
     internal class TestResultAdaptor : ITestResultAdaptor
     {
         private TNode m_Node;
+        private ITestResult m_Result;
 
         internal TestResultAdaptor(ITestResult result, ITestAdaptor test, ITestResultAdaptor[] children = null)
         {
@@ -30,7 +31,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
             HasChildren = result.HasChildren;
             Output = result.Output;
             Children = children;
-            m_Node = result.ToXml(true);
+            m_Result = result;
         }
 
         internal TestResultAdaptor(RemoteTestResultData result, RemoteTestResultDataWithTestData allData)
@@ -53,7 +54,10 @@ namespace UnityEditor.TestTools.TestRunner.Api
             HasChildren = result.hasChildren;
             Output = result.output;
             Children = result.childrenIds.Select(childId => new TestResultAdaptor(allData.results.First(r => r.testId == childId), allData)).ToArray();
-            m_Node = TNode.FromXml(result.xml);
+            if (!string.IsNullOrEmpty(result.xml))
+            {
+                m_Node = TNode.FromXml(result.xml);
+            }
         }
 
         public ITestAdaptor Test { get; private set; }
@@ -76,6 +80,10 @@ namespace UnityEditor.TestTools.TestRunner.Api
         public string Output { get; private set; }
         public TNode ToXml()
         {
+            if (m_Node == null)
+            {
+                m_Node = m_Result.ToXml(true);
+            }
             return m_Node;
         }
 

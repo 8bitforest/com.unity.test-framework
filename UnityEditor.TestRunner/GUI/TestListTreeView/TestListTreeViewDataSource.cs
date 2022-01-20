@@ -32,7 +32,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             if (sceneName.StartsWith("InitTestScene"))
                 sceneName = PlaymodeTestsController.GetController().settings.originalScene;
 
-            var testListBuilder = new TestTreeViewBuilder(m_RootTest, m_TestListGUI.newResultList, m_TestListGUI.m_TestRunnerUIFilter);
+            var testListBuilder = new TestTreeViewBuilder(m_RootTest, m_TestListGUI.ResultsByKey, m_TestListGUI.m_TestRunnerUIFilter);
 
             m_RootItem = testListBuilder.BuildTreeView(null, false, sceneName);
             SetExpanded(m_RootItem, true);

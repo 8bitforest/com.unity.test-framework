@@ -4,7 +4,7 @@ The Unity Test Framework (UTF) enables Unity users to test their code in both **
 
 This package provides a standard test framework for users of Unity and developers at Unity so that both benefit from the same features and can write tests the same way. 
 
-UTF uses a Unity integration of NUnit library, which is an open-source unit testing library for .Net languages. For more information about NUnit, see the [official NUnit website](http://www.nunit.org/) and the [NUnit documentation on GitHub](https://github.com/nunit/docs/wiki/NUnit-Documentation).
+UTF uses a Unity integration of NUnit library, which is an open-source unit testing library for .Net languages. UTF currently uses NUnit version 3.5. For more information about NUnit, see the [official NUnit website](http://www.nunit.org/) and the [NUnit documentation](https://docs.nunit.org/).
 
 > **Note**: UTF is not a new concept or toolset; it is an adjusted and more descriptive naming for the toolset otherwise known as Unity Test Runner, which is now available as this package. 
 
@@ -35,6 +35,7 @@ Unity Test Framework version 1.0.18 includes the following known limitations:
 * The `UnityTest` attribute does not support the `NUnit` [Repeat](https://github.com/nunit/docs/wiki/Repeat-Attribute) attribute.
 * Nested test fixture cannot run from the Editor UI. 
 * When using the `NUnit` [Retry](https://github.com/nunit/docs/wiki/Retry-Attribute) attribute in PlayMode tests, it throws `InvalidCastException`.
+* Async tests are not supported in the current version of UTF.
 
 ## Package contents
 
@@ -48,6 +49,7 @@ The following table indicates the root folders in the package where you can find
 
 | Date         | Reason                                                |
 | :----------- | :---------------------------------------------------- |
+| February 4, 2021 | Applied user feedback to the documentation. Matches package version 1.1.22 |
 | August 23, 2019 | Applied feedback to the documentation |
 | July 25, 2019 | Documentation updated to include features in version 1.1.0 |
 | July 11, 2019 | Documentation updated. Matches package version 1.0.18 |

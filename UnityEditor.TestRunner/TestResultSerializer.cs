@@ -64,7 +64,10 @@ namespace UnityEditor.TestTools.TestRunner
             baseType.GetField("_resultState", flags).SetValue(result, resultState);
             baseType.GetField("_output", flags).SetValue(result, new StringBuilder(output));
             baseType.GetField("_duration", flags).SetValue(result, duration);
-            baseType.GetField("_message", flags).SetValue(result, message);
+            if (!string.IsNullOrEmpty(message))
+            {
+                baseType.GetField("_message", flags).SetValue(result, message);   
+            }
             baseType.GetField("_stackTrace", flags).SetValue(result, stacktrace);
             baseType.GetProperty("StartTime", flags)
                 .SetValue(result, DateTime.FromOADate(startTimeAO), null);

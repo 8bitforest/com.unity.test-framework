@@ -23,8 +23,29 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         [SerializeField]
         protected TestRunnerWindow m_Window;
+
+        public List<TestRunnerResult> newResultList
+        {
+            get { return m_NewResultList; }
+            set { 
+                m_ResultByKey = null;
+                m_NewResultList = value;
+            }
+        }
         [SerializeField]
-        public List<TestRunnerResult> newResultList = new List<TestRunnerResult>();
+        private List<TestRunnerResult> m_NewResultList = new List<TestRunnerResult>();
+
+        Dictionary<string, TestRunnerResult> m_ResultByKey;
+        internal Dictionary<string, TestRunnerResult> ResultsByKey
+        {
+            get
+            {
+                if (m_ResultByKey == null)
+                    m_ResultByKey = newResultList.ToDictionary(k => k.uniqueId);
+                return m_ResultByKey;
+            }
+        }
+        
         [SerializeField]
         private string m_ResultText;
         [SerializeField]
@@ -245,19 +266,12 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 return;
             }
 
-            if (newResultList.All(x => x.uniqueId != result.uniqueId))
-            {
-                return;
-            }
-
-            var testRunnerResult = newResultList.FirstOrDefault(x => x.uniqueId == result.uniqueId);
-            if (testRunnerResult != null)
+            if (ResultsByKey.TryGetValue(result.uniqueId, out var testRunnerResult))
             {
                 testRunnerResult.Update(result);
+                Repaint();
+                m_Window.Repaint();
             }
-
-            Repaint();
-            m_Window.Repaint();
         }
 
         public void UpdateTestTree(ITestAdaptor test)
@@ -278,8 +292,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
         {
             foreach (var testRunnerResult in m_QueuedResults)
             {
-                var existingResult = newResultList.FirstOrDefault(x => x.uniqueId == testRunnerResult.uniqueId);
-                if (existingResult != null)
+                if (ResultsByKey.TryGetValue(testRunnerResult.uniqueId, out var existingResult))
                 {
                     existingResult.Update(testRunnerResult);
                 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal.Commands;
 using NUnit.Framework.Interfaces;
@@ -36,7 +37,7 @@ namespace UnityEngine.TestTools
     /// 
     /// In Play Mode, a test runs as a coroutine attached to a [MonoBehaviour](https://docs.unity3d.com/ScriptReference/MonoBehaviour.html). So all the yield instructions available in coroutines, are also available in your test. 
     /// 
-    /// From a Play Mode test you can use one of Unity's [Yield Instructions](https://docs.unity3d.com/ScriptReference/YieldInstruction.html):
+    /// From a Play Mode test you can use one of Unity’s [Yield Instructions](https://docs.unity3d.com/ScriptReference/YieldInstruction.html):
     /// 
     /// - [WaitForFixedUpdate](https://docs.unity3d.com/ScriptReference/WaitForFixedUpdate.html): to ensure changes expected within the next cycle of physics calculations.
     /// - [WaitForSeconds](https://docs.unity3d.com/ScriptReference/WaitForSeconds.html): if you want to pause your test coroutine for a fixed amount of time. Be careful about creating long-running tests.
@@ -58,8 +59,10 @@ namespace UnityEngine.TestTools
     /// </example>
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class UnityTestAttribute : CombiningStrategyAttribute, ISimpleTestBuilder, IImplyFixture
+    public class UnityTestAttribute : CombiningStrategyAttribute, ISimpleTestBuilder, IImplyFixture, ITestBuilder, IApplyToTest
     {
+        const string k_MethodMarkedWithUnitytestMustReturnIenumerator = "Method marked with UnityTest must return IEnumerator.";
+
         /// <summary>
         /// Initializes and returns an instance of UnityTestAttribute.
         /// </summary>
@@ -67,7 +70,42 @@ namespace UnityEngine.TestTools
 
         private readonly NUnitTestCaseBuilder _builder = new NUnitTestCaseBuilder();
 
+        /// <summary>
+        /// This method builds the TestMethod from the Test and the method info. In addition it removes the expected result of the test.
+        /// </summary>
+        /// <param name="method">The method info.</param>
+        /// <param name="suite">The test.</param>
+        /// <returns>A TestMethod object</returns>
         TestMethod ISimpleTestBuilder.BuildFrom(IMethodInfo method, Test suite)
+        {
+            var t = CreateTestMethod(method, suite);
+
+            AdaptToUnityTestMethod(t);
+
+            return t;
+        }
+
+        /// <summary>
+        /// This method hides the base method from CombiningStrategyAttribute.
+        /// It builds a TestMethod from a Parameterized Test and the method info.
+        /// In addition it removes the expected result of the test.
+        /// </summary>
+        /// <param name="method">The method info.</param>
+        /// <param name="suite">The test.</param>
+        /// <returns>A TestMethod object</returns>
+        IEnumerable<TestMethod> ITestBuilder.BuildFrom(IMethodInfo method, Test suite)
+        {
+            var testMethods  = base.BuildFrom(method, suite);
+
+            foreach (var t in testMethods)
+            {
+                AdaptToUnityTestMethod(t);
+            }
+
+            return testMethods;
+        }
+
+        TestMethod CreateTestMethod(IMethodInfo method, Test suite)
         {
             TestCaseParameters parms = new TestCaseParameters
             {
@@ -76,17 +114,36 @@ namespace UnityEngine.TestTools
             };
 
             var t = _builder.BuildTestMethod(method, suite, parms);
-
-            if (t.parms != null)
-                t.parms.HasExpectedResult = false;
-
-            if (!method.ReturnType.IsType(typeof(IEnumerator)))
-            {
-                t.RunState = RunState.NotRunnable;
-                t.Properties.Set(PropertyNames.SkipReason, "Method marked with UnityTest must return IEnumerator.");
-            }
- 
             return t;
+        }
+
+        static void AdaptToUnityTestMethod(TestMethod t)
+        {
+            if (t.parms != null)
+            {
+                t.parms.HasExpectedResult = false;
+            }
+        }
+
+        static bool IsMethodReturnTypeIEnumerator(IMethodInfo method)
+        {
+            return !method.ReturnType.IsType(typeof(IEnumerator));
+        }
+
+        /// <summary>
+        /// This method hides the base method ApplyToTest from CombiningStrategyAttribute.
+        /// In addition it ensures that the test with the `UnityTestAttribute` has an IEnumerator as return type.
+        /// </summary>
+        /// <param name="test">The test.</param>
+        public new void ApplyToTest(Test test)
+        {
+            if (IsMethodReturnTypeIEnumerator(test.Method))
+            {
+                test.RunState = RunState.NotRunnable;
+                test.Properties.Set(PropertyNames.SkipReason, k_MethodMarkedWithUnitytestMustReturnIenumerator);
+            }
+
+            base.ApplyToTest(test);
         }
     }
 }

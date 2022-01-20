@@ -28,7 +28,7 @@ namespace UnityEngine.TestRunner.TestLaunchers
         public string xml;
         public string[] childrenIds;
 
-        internal RemoteTestResultData(ITestResult result)
+        internal RemoteTestResultData(ITestResult result, bool isTopLevel)
         {
             testId = result.Test.Id;
             name = result.Name;
@@ -47,7 +47,10 @@ namespace UnityEngine.TestRunner.TestLaunchers
             inconclusiveCount = result.InconclusiveCount;
             hasChildren = result.HasChildren;
             output = result.Output;
-            xml = result.ToXml(true).OuterXml;
+            if (isTopLevel)
+            {
+                xml = result.ToXml(true).OuterXml;
+            }
             childrenIds = result.Children.Select(child => child.Test.Id).ToArray();
         }
     }

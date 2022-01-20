@@ -6,6 +6,8 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
 using NUnit.Framework.Internal.Execution;
+using UnityEngine.TestRunner.NUnitExtensions;
+using Unity.Profiling;
 using UnityEngine.TestRunner.NUnitExtensions.Runner;
 using UnityEngine.TestTools.TestRunner;
 
@@ -35,7 +37,7 @@ namespace UnityEngine.TestTools
                 context.CurrentResult.RecordException(ex);
                 yield break;
             }
-            
+
             if (currentExecutingTestEnumerator != null)
             {
                 var testEnumeraterYieldInstruction = new TestEnumerator(context, currentExecutingTestEnumerator);
@@ -44,8 +46,8 @@ namespace UnityEngine.TestTools
 
                 var enumerator = testEnumeraterYieldInstruction.Execute();
 
-                var executingEnumerator = ExecuteEnumerableAndRecordExceptions(enumerator, context);
-                while (executingEnumerator.MoveNext())
+                var executingEnumerator = ExecuteEnumerableAndRecordExceptions(enumerator, new EnumeratorContext(context));
+                while (AdvanceEnumerator(executingEnumerator))
                 {
                     yield return executingEnumerator.Current;
                 }
@@ -59,10 +61,21 @@ namespace UnityEngine.TestTools
             }
         }
 
-        private static IEnumerator ExecuteEnumerableAndRecordExceptions(IEnumerator enumerator, ITestExecutionContext context)
+        private bool AdvanceEnumerator(IEnumerator enumerator)
+        {
+            using (new ProfilerMarker(testMethod.MethodName).Auto())
+                return enumerator.MoveNext();
+        }
+
+        private IEnumerator ExecuteEnumerableAndRecordExceptions(IEnumerator enumerator, EnumeratorContext context)
         {
             while (true)
             {
+                if (context.ExceptionWasRecorded)
+                {
+                    break;
+                }
+
                 try
                 {
                     if (!enumerator.MoveNext())
@@ -72,14 +85,13 @@ namespace UnityEngine.TestTools
                 }
                 catch (Exception ex)
                 {
-                    context.CurrentResult.RecordException(ex);
+                    context.RecordExceptionWithHint(ex);
                     break;
                 }
 
-                if (enumerator.Current is IEnumerator)
+                if (enumerator.Current is IEnumerator nestedEnumerator)
                 {
-                    var current = (IEnumerator)enumerator.Current; 
-                    yield return ExecuteEnumerableAndRecordExceptions(current, context);
+                    yield return ExecuteEnumerableAndRecordExceptions(nestedEnumerator, context);
                 }
                 else
                 {
@@ -87,6 +99,33 @@ namespace UnityEngine.TestTools
                 }
             }
         }
+
+        private class EnumeratorContext
+        {
+            private readonly ITestExecutionContext m_Context;
+
+            public EnumeratorContext(ITestExecutionContext context)
+            {
+                m_Context = context;
+            }
+
+            public bool ExceptionWasRecorded
+            {
+                get;
+                private set;
+            }
+
+            public void RecordExceptionWithHint(Exception ex)
+            {
+                if (ExceptionWasRecorded)
+                {
+                    return;
+                }
+                m_Context.CurrentResult.RecordException(ex);
+                ExceptionWasRecorded = true;
+            }
+        }
+
 
         public override TestResult Execute(ITestExecutionContext context)
         {

@@ -8,6 +8,10 @@ namespace UnityEngine.TestTools
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
     public class PrebuildSetupAttribute : Attribute
     {
+        /// <summary>
+        ///  Initializes and returns an instance of PrebuildSetupAttribute by type.
+        /// </summary>
+        /// <param name="targetClass">The type of the target class.</param>
         public PrebuildSetupAttribute(Type targetClass)
         {
             TargetClass = targetClass;

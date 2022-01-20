@@ -1,7 +1,7 @@
 {
   "name": "com.unity.test-framework",
   "displayName": "Test Framework (8-Bit Modified)",
-  "version": "1.1.22+8bit-1.0.0",
+  "version": "1.1.30+8bit-1.0.0",
   "unity": "2019.2",
   "unityRelease": "0a10",
   "description": "Test framework for running Edit mode and Play mode tests in Unity. This fork has been modified to add [UnityOneTimeSetUp], [UnityOneTimeTearDown], and all Async variants.",
@@ -15,6 +15,6 @@
     "com.unity.modules.jsonserialize": "1.0.0"
   },
   "relatedPackages": {
-    "com.unity.test-framework.tests": "1.1.22"
+    "com.unity.test-framework.tests": "1.1.30"
   }
 }

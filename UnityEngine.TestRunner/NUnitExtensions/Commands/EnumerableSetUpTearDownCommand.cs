@@ -1,29 +1,43 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
+using Unity.Profiling;
 using UnityEngine.TestRunner.NUnitExtensions.Runner;
 
 namespace UnityEngine.TestTools
 {
     internal class EnumerableSetUpTearDownCommand : BeforeAfterTestCommandBase<MethodInfo>
     {
+        static readonly Dictionary<Type, List<MethodInfo>> m_BeforeActionsCache = new Dictionary<Type, List<MethodInfo>>();
+        static readonly Dictionary<Type, List<MethodInfo>> m_AfterActionsCache = new Dictionary<Type, List<MethodInfo>>();
+
         public EnumerableSetUpTearDownCommand(TestCommand innerCommand)
             : base(innerCommand, "SetUp", "TearDown")
         {
-            if (Test.TypeInfo.Type != null)
+            using (new ProfilerMarker(nameof(EnumerableSetUpTearDownCommand)).Auto())
             {
-                BeforeActions = GetMethodsWithAttributeFromFixture(Test.TypeInfo.Type, typeof(UnitySetUpAttribute));
-                AfterActions = GetMethodsWithAttributeFromFixture(Test.TypeInfo.Type, typeof(UnityTearDownAttribute)).Reverse().ToArray();
+                if (Test.TypeInfo.Type != null)
+                {
+                    BeforeActions = GetActions(m_BeforeActionsCache, Test.TypeInfo.Type, typeof(UnitySetUpAttribute), typeof(IEnumerator));
+                    AfterActions = GetActions(m_AfterActionsCache, Test.TypeInfo.Type, typeof(UnityTearDownAttribute), typeof(IEnumerator)).Reverse().ToArray();
+                }
             }
         }
 
-        private static MethodInfo[] GetMethodsWithAttributeFromFixture(Type fixtureType, Type setUpType)
+        protected override bool MoveAfterEnumerator(IEnumerator enumerator, Test test)
         {
-            MethodInfo[] methodsWithAttribute = Reflect.GetMethodsWithAttribute(fixtureType, setUpType, true);
-            return methodsWithAttribute.Where(x => x.ReturnType == typeof(IEnumerator)).ToArray();
+            using (new ProfilerMarker(test.Name + ".TearDown").Auto())
+                return base.MoveAfterEnumerator(enumerator, test);
+        }
+
+        protected override bool MoveBeforeEnumerator(IEnumerator enumerator, Test test)
+        {
+            using (new ProfilerMarker(test.Name + ".Setup").Auto())
+                return base.MoveBeforeEnumerator(enumerator, test);
         }
 
         protected override IEnumerator InvokeBefore(MethodInfo action, Test test, UnityTestExecutionContext context)

@@ -43,7 +43,7 @@ namespace UnityEngine.TestRunner.TestLaunchers
         private static RemoteTestResultData[] CreateTestResultDataList(ITestResult result)
         {
             var list = new List<RemoteTestResultData>();
-            list.Add(new RemoteTestResultData(result));
+            list.Add(new RemoteTestResultData(result, result.Test.Parent == null));
             list.AddRange(result.Children.SelectMany(CreateTestResultDataList));
             return list.ToArray();
         }

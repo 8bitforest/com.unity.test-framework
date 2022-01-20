@@ -171,7 +171,7 @@ namespace UnityEditor.TestTools.TestRunner
 
             if (m_EnumerableTestState == null)
             {
-                m_EnumerableTestState = CreateInstance<EnumerableTestState>();
+                m_EnumerableTestState = new EnumerableTestState();
             }
             context.EnumerableTestState = m_EnumerableTestState;
 

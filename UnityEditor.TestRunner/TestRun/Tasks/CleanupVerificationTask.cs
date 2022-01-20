@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -19,7 +20,9 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
 
             if (currentFiles.Length != existingFiles.Length)
             {
-                LogWarningForFilesIfAny(currentFiles.Where(file => !testJobData.existingFiles.Contains(file)).ToArray());
+                var existingFilesHashSet = new HashSet<string>(existingFiles);
+                var newFiles = currentFiles.Where(file => !existingFilesHashSet.Contains(file)).ToArray();
+                LogWarningForFilesIfAny(newFiles);
             }
 
             yield return null;
@@ -27,7 +30,7 @@ namespace UnityEditor.TestTools.TestRunner.TestRun.Tasks
         
         private void LogWarningForFilesIfAny(string[] filePaths)
         {
-            if (!filePaths.Any())
+            if (filePaths.Length == 0)
             {
                 return;
             }

@@ -32,7 +32,7 @@ private class MyCallbacks : ICallbacks
 
     public void TestFinished(ITestResultAdaptor result)
     {
-        if (!result.HasChildren && result.ResultState != "Success")
+        if (!result.HasChildren && result.ResultState != "Passed")
         {
             Debug.Log(string.Format("Test {0} {1}", result.Test.Name, result.ResultState));
         }

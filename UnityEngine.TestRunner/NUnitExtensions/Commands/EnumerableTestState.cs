@@ -1,6 +1,9 @@
+using System;
+
 namespace UnityEngine.TestTools
 {
-    internal class EnumerableTestState : ScriptableObject
+    [Serializable]
+    internal class EnumerableTestState
     {
         public int Repeat;
         public int Retry;

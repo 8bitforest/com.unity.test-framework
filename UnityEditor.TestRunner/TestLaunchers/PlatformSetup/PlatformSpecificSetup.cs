@@ -11,8 +11,10 @@ namespace UnityEditor.TestTools.TestRunner
         private ApplePlatformSetup m_AppleiOSPlatformSetup = new ApplePlatformSetup(BuildTarget.iOS);
         [SerializeField]
         private ApplePlatformSetup m_AppleTvOSPlatformSetup = new ApplePlatformSetup(BuildTarget.tvOS);
+#if !UNITY_2021_1_OR_NEWER
         [SerializeField]
         private XboxOnePlatformSetup m_XboxOnePlatformSetup = new XboxOnePlatformSetup();
+#endif
         [SerializeField]
         private AndroidPlatformSetup m_AndroidPlatformSetup = new AndroidPlatformSetup();
         [SerializeField]
@@ -108,7 +110,9 @@ namespace UnityEditor.TestTools.TestRunner
             {
                 {BuildTarget.iOS, m_AppleiOSPlatformSetup},
                 {BuildTarget.tvOS, m_AppleTvOSPlatformSetup},
+#if !UNITY_2021_1_OR_NEWER
                 {BuildTarget.XboxOne, m_XboxOnePlatformSetup},
+#endif
                 {BuildTarget.Android, m_AndroidPlatformSetup},
                 {BuildTarget.WSAPlayer, m_UwpPlatformSetup},
                 {BuildTarget.Lumin, m_LuminPlatformSetup},

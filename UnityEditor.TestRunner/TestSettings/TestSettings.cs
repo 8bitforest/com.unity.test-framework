@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Rendering;
 
 namespace UnityEditor.TestTools.TestRunner
 {
@@ -83,6 +86,31 @@ namespace UnityEditor.TestTools.TestRunner
                     if (provisioningUUID != null)
                         PlayerSettings.iOS.tvOSManualProvisioningProfileID = provisioningUUID;
                 }),
+            new TestSetting<bool>(
+                settings => settings.autoGraphicsAPIs,
+                () => PlayerSettings.GetUseDefaultGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget),
+                autoGraphicsAPIs =>
+                {
+                    PlayerSettings.SetUseDefaultGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget, autoGraphicsAPIs);
+                }),
+            new TestSetting<string[]>(
+                settings => settings.playerGraphicsAPIs,
+                () => PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget).Select(api => api.ToString()).ToArray(),
+                playerGraphicsAPIs =>
+                {
+                    if (playerGraphicsAPIs != null && playerGraphicsAPIs.Length > 0)
+                    {
+                        var graphicsAPIs = new List<GraphicsDeviceType>();
+                        foreach (var graphicsAPI in playerGraphicsAPIs)
+                        {
+                            if (GraphicsDeviceType.TryParse(graphicsAPI, true, out GraphicsDeviceType playerGraphicsAPI))
+                                graphicsAPIs.Add(playerGraphicsAPI);
+                        }
+
+                        if (graphicsAPIs.Count > 0)
+                            PlayerSettings.SetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget, graphicsAPIs.ToArray());
+                    }
+                }),
         };
 
         private bool m_Disposed;
@@ -99,6 +127,8 @@ namespace UnityEditor.TestTools.TestRunner
         public string iOSManualProvisioningProfileID { get; set; }
         public ProvisioningProfileType? tvOSManualProvisioningProfileType { get; set; }
         public string tvOSManualProvisioningProfileID { get; set; }
+        public string[] playerGraphicsAPIs { get; set; }
+        public bool autoGraphicsAPIs { get; set; }
 
         public void Dispose()
         {

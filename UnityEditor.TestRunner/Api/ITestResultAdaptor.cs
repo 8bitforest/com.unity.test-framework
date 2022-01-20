@@ -28,7 +28,7 @@ namespace UnityEditor.TestTools.TestRunner.Api
         ///Gets the state of the result as a string.
         ///</summary>
         ///<returns>
-        ///It returns one of these values: `Success`, `Skipped`, `Failure`, `Explicit`, `Cancelled`
+        ///It returns one of these values: `Inconclusive`, `Skipped`, `Skipped:Ignored`, `Skipped:Explicit`, `Passed`, `Failed`, `Failed:Error`, `Failed:Cancelled`, `Failed:Invalid`
         ///</returns>
         string ResultState { get; }
         ///<summary>

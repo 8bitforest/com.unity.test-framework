@@ -10,7 +10,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
     internal class TestTreeViewBuilder
     {
         public List<TestRunnerResult> results = new List<TestRunnerResult>();
-        private readonly List<TestRunnerResult> m_OldTestResultList;
+        private readonly Dictionary<string, TestRunnerResult> m_OldTestResults;
         private readonly TestRunnerUIFilter m_UIFilter;
         private readonly ITestAdaptor m_TestListRoot;
 
@@ -21,10 +21,10 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             get { return m_AvailableCategories.Distinct().OrderBy(a => a).ToArray(); }
         }
 
-        public TestTreeViewBuilder(ITestAdaptor tests, List<TestRunnerResult> oldTestResultResults, TestRunnerUIFilter uiFilter)
+        public TestTreeViewBuilder(ITestAdaptor tests, Dictionary<string, TestRunnerResult> oldTestResultResults, TestRunnerUIFilter uiFilter)
         {
             m_AvailableCategories.Add(CategoryFilterExtended.k_DefaultCategory);
-            m_OldTestResultList = oldTestResultResults;
+            m_OldTestResults = oldTestResultResults;
             m_TestListRoot = tests;
             m_UIFilter = uiFilter;
         }
@@ -56,7 +56,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             var testElementId = testElement.UniqueName;
             if (!testElement.HasChildren)
             {
-                var result = m_OldTestResultList.FirstOrDefault(a => a.uniqueId == testElementId);
+                m_OldTestResults.TryGetValue(testElementId, out var result);
 
                 if (result != null &&
                     (result.ignoredOrSkipped
@@ -83,7 +83,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
                 return;
             }
 
-            var groupResult = m_OldTestResultList.FirstOrDefault(a => a.uniqueId == testElementId);
+            m_OldTestResults.TryGetValue(testElementId, out var groupResult);
             if (groupResult == null)
             {
                 groupResult = new TestRunnerResult(testElement);

@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal.Filters;
 using UnityEditor.TestTools.TestRunner.Api;
+using UnityEditor.TestTools.TestRunner.TestRun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestRunner.Utils;
@@ -31,6 +32,8 @@ namespace UnityEditor.TestTools.TestRunner
         public override void Run()
         {
             IsRunning = true;
+            m_Settings.consoleErrorPaused = ConsoleWindow.GetConsoleErrorPause();
+            m_Settings.runInBackgroundValue = Application.runInBackground;
             ConsoleWindow.SetConsoleErrorPause(false);
             Application.runInBackground = true;
 
@@ -114,6 +117,8 @@ namespace UnityEditor.TestTools.TestRunner
                 }
                 else if (state == PlayModeStateChange.EnteredEditMode)
                 {
+                    ConsoleWindow.SetConsoleErrorPause(runner.settings.consoleErrorPaused);
+                    Application.runInBackground = runner.settings.runInBackgroundValue;
                     //reopen the original scene once we exit playmode
                     ReopenOriginalScene(runner);
                 }

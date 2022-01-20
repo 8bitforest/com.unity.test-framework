@@ -8,11 +8,19 @@ namespace UnityEngine.TestTools
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
     public class PostBuildCleanupAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes and returns an instance of PostBuildCleanupAttribute by type.
+        /// </summary>
+        /// <param name="targetClass">The type of the target class.</param>
         public PostBuildCleanupAttribute(Type targetClass)
         {
             TargetClass = targetClass;
         }
 
+        /// <summary>
+        /// Initializes and returns an instance of PostBuildCleanupAttribute by class name.
+        /// </summary>
+        /// <param name="targetClassName">The name of the target class.</param>
         public PostBuildCleanupAttribute(string targetClassName)
         {
             TargetClass = AttributeHelper.GetTargetClassFromName(targetClassName, typeof(IPostBuildCleanup));

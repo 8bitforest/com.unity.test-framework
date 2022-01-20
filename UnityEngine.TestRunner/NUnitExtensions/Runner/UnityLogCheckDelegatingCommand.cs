@@ -78,7 +78,6 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         
         static bool ExecuteAndCheckLog(LogScope logScope, TestResult result, Action action)
             => CaptureException(result, action) && CheckLogs(result, logScope);
-        
 
         static void PostTestValidation(LogScope logScope, TestCommand command, TestResult result)
         {
@@ -87,7 +86,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         }
 
         static bool CheckLogs(TestResult result, LogScope logScope)
-            => CheckFailingLogs(logScope, result) && CheckExpectedLogs(logScope, result);
+            => CheckFailingLogs(logScope, result) && CheckExpectedLogs(logScope, result); 
 
         static bool CheckFailingLogs(LogScope logScope, TestResult result)
         {

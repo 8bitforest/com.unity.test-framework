@@ -80,7 +80,7 @@ public class CreateSpriteTest : IPrebuildSetup
 
         // Check with NULL Texture. Should return NULL Sprite.
 
-        m_Sprite = Sprite.Create(null, new Rect(0, 0, m_Texture.width, m_Texture.heig`t), new Vector2(0.5f, 0.5f));
+        m_Sprite = Sprite.Create(null, new Rect(0, 0, m_Texture.width, m_Texture.height), new Vector2(0.5f, 0.5f));
 
         Assert.That(m_Sprite, Is.Null, "Sprite created with null texture should be null");
 

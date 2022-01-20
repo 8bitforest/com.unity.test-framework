@@ -13,9 +13,9 @@ namespace UnityEditor.TestTools.TestRunner.Api
     /// <summary>
     /// The TestRunnerApi retrieves and runs tests programmatically from code inside the project, or inside other packages. TestRunnerApi is a [ScriptableObject](https://docs.unity3d.com/ScriptReference/ScriptableObject.html).
     ///You can initialize the API like this:
-    /// ```
+    /// <code>
     /// var testRunnerApi = ScriptableObject.CreateInstance&lt;TestRunnerApi&gt;();
-    /// ```
+    /// </code>
     /// Note: You can subscribe and receive test results in one instance of the API, even if the run starts from another instance.
     /// The TestRunnerApi supports the following workflows:
     /// - [How to run tests programmatically](https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/extension-run-tests.html)

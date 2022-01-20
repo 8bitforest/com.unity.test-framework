@@ -4,6 +4,7 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using NUnit.Framework.Internal.Commands;
 using NUnit.Framework.Internal.Execution;
+using UnityEngine.TestTools.TestRunner;
 using UnityEngine.TestTools.Utils;
 
 namespace UnityEngine.TestRunner.NUnitExtensions.Runner
@@ -59,7 +60,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
 
                 if (coroutineRunner.HasFailedWithTimeout())
                 {
-                    Context.CurrentResult.SetResult(ResultState.Failure, string.Format("Test exceeded Timeout value of {0}ms", Context.TestCaseTimeout));
+                    Context.CurrentResult.SetResult(ResultState.Failure, new UnityTestTimeoutException(Context.TestCaseTimeout).Message);
                 }
 
                 while (executeEnumerable.MoveNext()) {}

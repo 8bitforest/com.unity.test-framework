@@ -15,14 +15,18 @@ To create a **Play Mode** test, you can follow a similar process as when you wan
 
 ## References and builds
 
-Unity Test Framework adds a reference to `TestAssemblies` in the [Assembly Definition](https://docs.unity3d.com/Manual/ScriptCompilationAssemblyDefinitionFiles.html) file, but it won't include any other references (e.g., to other scripting assemblies within the Unity project). So you need to add other assemblies yourself if you want to test them too.
+Unity Test Framework adds a reference to `TestAssemblies` in the Assembly Definition file but does not include any other references (e.g., to other scripting assemblies within the Unity project). To test other assemblies, you need to add them to the assembly definition yourself. For how to add assembly references, see [Assembly Definition](https://docs.unity3d.com/Manual/ScriptCompilationAssemblyDefinitionFiles.html).
+We recommend putting tests into separate assemblies and using assembly definitions files. This way you will have more control over which assemblies need to reference test related dlls.
 
-Unity does not include `TestAssemblies` in Player builds, but in the Test Runner window, we have such an option. If you need to test code in pre-defined assemblies, you can reference `TestAssemblies` from other assemblies. You must remove these tests after the test run so that Unity does not add them to the final Player build.
-
-To do this, in the Test Runner window choose **Enable playmode tests for all assemblies** option from the drop-down menu (to expand, click on the small list item in the top right corner). In the dialog box, click **OK** to manually restart the Editor.
-
-![Enable Play Mode tests for all assemblies](./images/playmode-enable-all.png)
-
+#### Playmode build with TestsAssemblies 
 > **Note**: **Enabling Play Mode tests for all assemblies** includes additional assemblies in your project build, which can increase the project’s size as well as the build time.
+> 
+The supported workflow is to exclude `TestAssemblies` from Player builds. You can choose to enable playmode tests for all assemblies to run your tests inside the Editor, but this should be disabled again before building the Player to prevent build failures.
+
+To enable play mode tests for all assemblies you need to set the flag `playModeTestRunnerEnabled` to 1 inside the `ProjectSettings/ProjectSetting.asset` file in your project.
+Before building the Player you must disable it again, either by setting the flag back to 0 or by clicking on `Disable playmode tests for all assemblies` in the dropdown menu, accessed by right-clicking on the Test Runner window tab.
+![Disable Play Mode tests for all assemblies](./images/playmode-disable-all.png)
+
+
 
 For more information, see [Edit Mode vs. Play Mode tests](./edit-mode-vs-play-mode-tests.md).

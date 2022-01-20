@@ -63,8 +63,13 @@ namespace UnityEditor.TestTools.TestRunner
                 return true;
             }
 
-            var attributesFromMethods = test.Method.GetCustomAttributes<UnityPlatformAttribute>(true).Select(attribute => attribute);
-            var attributesFromTypes = test.Method.TypeInfo.GetCustomAttributes<UnityPlatformAttribute>(true).Select(attribute => attribute);
+            var attributesFromMethods = test.Method.GetCustomAttributes<UnityPlatformAttribute>(true);
+            var attributesFromTypes = test.Method.TypeInfo.GetCustomAttributes<UnityPlatformAttribute>(true);
+
+            if (attributesFromMethods.Length == 0 && attributesFromTypes.Length == 0)
+            {
+                return true;
+            }
 
             if (!attributesFromMethods.All(a => a.IsPlatformSupported(testTargetPlatform)))
             {

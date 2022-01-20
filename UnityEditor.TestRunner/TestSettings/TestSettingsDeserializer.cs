@@ -22,6 +22,11 @@ namespace UnityEditor.TestTools.TestRunner
             new SettingsMap<string>("iOSManualProvisioningProfileID", (settings, value) => settings.iOSManualProvisioningProfileID = value),
             new SettingsMap<ProvisioningProfileType>("tvOSManualProvisioningProfileType", (settings, value) => settings.tvOSManualProvisioningProfileType = value),
             new SettingsMap<string>("tvOSManualProvisioningProfileID", (settings, value) => settings.tvOSManualProvisioningProfileID = value),
+            new SettingsMap<string>("playerGraphicsAPI", (settings, value) =>
+            {
+                settings.autoGraphicsAPIs = false;
+                settings.playerGraphicsAPIs = new[] {value};
+            }),
         };
 
         private readonly Func<ITestSettings> m_TestSettingsFactory;
