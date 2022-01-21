@@ -75,7 +75,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                     PerformOneTimeSetUp();
                                     if (_unitySetupMethods != null)
                                         foreach (var method in _unitySetupMethods)
-                                            yield return Reflect.InvokeMethod(method, Context.TestObject);
+                                            yield return TryEnumerator(Reflect.InvokeMethod(method, Context.TestObject) as IEnumerator);
                                     if (_asyncSetupMethods != null)
                                         foreach (var method in _asyncSetupMethods)
                                             yield return WaitForTask(Reflect.InvokeMethod(method, Context.TestObject) as Task);
@@ -111,7 +111,7 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                                             yield return WaitForTask(Reflect.InvokeMethod(method, Context.TestObject) as Task);
                                     if (_unityTeardownMethods != null)
                                         foreach (var method in _unityTeardownMethods)
-                                            yield return Reflect.InvokeMethod(method, Context.TestObject);
+                                            yield return TryEnumerator(Reflect.InvokeMethod(method, Context.TestObject) as IEnumerator);
                                     PerformOneTimeTearDown();
                                 }
                             }
@@ -395,6 +395,31 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
         {
             while (!task.IsCompleted)
                 yield return null;
+
+            if (task.IsFaulted)
+                Context.CurrentResult.RecordException(task.Exception);
+        }
+        
+        private IEnumerator TryEnumerator(IEnumerator enumerator)
+        {
+            while (true)
+            {
+                try
+                {
+                    if (!enumerator.MoveNext())
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    Context.CurrentResult.RecordException(ex);
+                    break;
+                }
+
+                if (enumerator.Current is IEnumerator nestedEnumerator)
+                    yield return TryEnumerator(nestedEnumerator);
+                else
+                    yield return enumerator.Current;
+            }
         }
     }
 }

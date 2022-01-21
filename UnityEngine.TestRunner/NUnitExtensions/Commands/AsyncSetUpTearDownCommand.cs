@@ -45,6 +45,9 @@ namespace UnityEngine.TestTools
         {
             while (!task.IsCompleted)
                 yield return null;
+
+            if (task.IsFaulted)
+                throw task.Exception!;
         }
 
         protected override BeforeAfterTestCommandState GetState(UnityTestExecutionContext context)
