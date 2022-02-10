@@ -49,6 +49,11 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             return false;
         }
 
+        private bool IsFixture(ITestAdaptor test)
+        {
+            return test.IsSuite && test.Children.All(c => !c.IsSuite && !c.IsTestAssembly && !c.HasChildren);
+        }
+
         private void ParseTestTree(int depth, TreeViewItem rootItem, ITestAdaptor testElement)
         {
             m_AvailableCategories.AddRange(testElement.Categories);
@@ -90,10 +95,25 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
 
             results.Add(groupResult);
-            var group = new TestTreeViewItem(testElement, depth, rootItem);
-            group.SetResult(groupResult);
 
-            depth++;
+            TreeViewItem group;
+
+            // Determine if this group should be shown
+            var collapse = !testElement.IsTestAssembly && !IsFixture(testElement) && testElement.Children.Count() == 1 &&
+                           testElement.Children.Any(c => !IsFixture(c));
+
+            if (collapse)
+            {
+                group = rootItem;
+                
+            }
+            else {
+                var testGroup = new TestTreeViewItem(testElement, depth, rootItem);
+                testGroup.SetResult(groupResult);
+                group = testGroup;
+                depth++;
+            }
+
             foreach (var child in testElement.Children)
             {
                 ParseTestTree(depth, group, child);
@@ -103,7 +123,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             if (testElement.IsTestAssembly && !testElement.HasChildren)
                 return;
 
-            if (group.hasChildren)
+            if (group.hasChildren && !collapse)
                 rootItem.AddChild(group);
         }
     }

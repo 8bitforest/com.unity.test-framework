@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEditor.IMGUI.Controls;
@@ -51,6 +52,18 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             }
 
             displayName = test.Name.Replace("\n", "");
+
+            // If this node is a Namespace, Generate display name by prepending parents that have only one child
+            if (test.HasChildren && test.Children.Any(c => c.IsSuite))
+            {
+                var testParent = test.Parent;
+                while (testParent != null && testParent.Children.Count() == 1 && !testParent.IsTestAssembly)
+                {
+                    displayName = $"{testParent.Name.Replace("\n", "")}.{displayName}";
+                    testParent = testParent.Parent;
+                }
+            }
+
             icon = Icons.s_UnknownImg;
         }
 

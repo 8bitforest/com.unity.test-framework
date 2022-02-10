@@ -41,7 +41,7 @@ namespace UnityEditor.TestTools.TestRunner.GUI
             get
             {
                 if (m_ResultByKey == null)
-                    m_ResultByKey = newResultList.ToDictionary(k => k.uniqueId);
+                    m_ResultByKey = newResultList.GroupBy(k => k.uniqueId).Select(k => k.First()).ToDictionary(k => k.uniqueId);
                 return m_ResultByKey;
             }
         }
